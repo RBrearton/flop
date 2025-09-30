@@ -26,3 +26,6 @@ packages/
 # Temporary files
 *.tmp
 *.log
+
+# ImGui settings
+imgui.ini
