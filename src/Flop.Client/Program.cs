@@ -1,4 +1,5 @@
 using System.Numerics;
+using Flop.Client;
 using ImGuiNET;
 using Raylib_cs;
 using rlImGui_cs;
@@ -14,42 +15,41 @@ int counter = 0;
 
 while (!Raylib.WindowShouldClose())
 {
-    Raylib.BeginDrawing();
-    Raylib.ClearBackground(Color.Black);
+    using (new DrawingContext())
+    {
+        Raylib.ClearBackground(Color.Black);
 
-    // Raylib drawing
-    Raylib.DrawText("Hello from Raylib!", 12, 12, 20, Color.White);
-    Raylib.DrawCircle(
-        700,
-        100,
-        30,
-        new Color((int)(color.X * 255), (int)(color.Y * 255), (int)(color.Z * 255), 255)
-    );
+        // Raylib drawing
+        Raylib.DrawText("Hello from Raylib!", 12, 12, 20, Color.White);
+        Raylib.DrawCircle(
+            700,
+            100,
+            30,
+            new Color((int)(color.X * 255), (int)(color.Y * 255), (int)(color.Z * 255), 255)
+        );
 
-    // ImGui UI
-    rlImGui.Begin();
+        // ImGui UI
+        using (new ImGuiRenderContext())
+        {
+            using (new ImGuiWindowContext("Demo Window"))
+            {
+                ImGui.Text("Simple ImGui demo!");
+                ImGui.Separator();
 
-    ImGui.Begin("Demo Window");
-    ImGui.Text("Simple ImGui demo!");
-    ImGui.Separator();
+                if (ImGui.Button("Click me!"))
+                    counter++;
+                ImGui.SameLine();
+                ImGui.Text($"Counter: {counter}");
 
-    if (ImGui.Button("Click me!"))
-        counter++;
-    ImGui.SameLine();
-    ImGui.Text($"Counter: {counter}");
+                ImGui.ColorEdit3("Circle Color", ref color);
 
-    ImGui.ColorEdit3("Circle Color", ref color);
+                ImGui.Checkbox("Show ImGui Demo", ref showDemoWindow);
+            }
 
-    ImGui.Checkbox("Show ImGui Demo", ref showDemoWindow);
-
-    ImGui.End();
-
-    if (showDemoWindow)
-        ImGui.ShowDemoWindow(ref showDemoWindow);
-
-    rlImGui.End();
-
-    Raylib.EndDrawing();
+            if (showDemoWindow)
+                ImGui.ShowDemoWindow(ref showDemoWindow);
+        }
+    }
 }
 
 rlImGui.Shutdown();
