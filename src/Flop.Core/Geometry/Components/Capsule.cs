@@ -1,7 +1,7 @@
 using System.Numerics;
 using Flop.Core.Geometry.Primitives;
 
-namespace Flop.Core.Geometry;
+namespace Flop.Core.Geometry.Components;
 
 /// <summary>
 /// A geometry component representing a capsule (cylinder with hemispherical ends).
