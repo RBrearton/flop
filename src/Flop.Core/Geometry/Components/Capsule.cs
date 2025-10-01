@@ -5,20 +5,56 @@ namespace Flop.Core.Geometry.Components;
 
 /// <summary>
 /// A geometry component representing a capsule (cylinder with hemispherical ends).
-/// Composed of a cylinder body with two hemisphere caps.
+/// Composed of a central cylinder body with hemisphere caps on both ends.
+/// Commonly used for character collision shapes in games.
 /// </summary>
 public readonly record struct Capsule : IGeometryComponent
 {
+    /// <summary>
+    /// The radius of the capsule's cylindrical body and hemispherical caps.
+    /// </summary>
     public float Radius { get; init; }
+
+    /// <summary>
+    /// The height of the cylindrical body (excluding the hemisphere caps).
+    /// </summary>
     public float Height { get; init; }
+
+    /// <summary>
+    /// The number of vertical subdivisions for the cylinder and hemispheres.
+    /// Higher values create smoother shapes but increase vertex count.
+    /// </summary>
     public int Slices { get; init; }
+
+    /// <summary>
+    /// The number of horizontal subdivisions for the hemispheres.
+    /// Higher values create smoother caps but increase vertex count.
+    /// </summary>
     public int Rings { get; init; }
+
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
 
+    /// <summary>
+    /// The diameter of the capsule (2 * Radius).
+    /// </summary>
     public float Diameter => Radius * 2;
+
+    /// <summary>
+    /// The total height of the capsule including both hemisphere caps.
+    /// Equal to Height + Diameter (cylinder height + 2 * radius).
+    /// </summary>
     public float TotalHeight => Height + Diameter;
 
+    /// <summary>
+    /// Create a capsule with the specified dimensions.
+    /// </summary>
+    /// <param name="radius">The radius of the capsule.</param>
+    /// <param name="height">The height of the cylindrical body (excluding caps).</param>
+    /// <param name="slices">The number of vertical subdivisions. Defaults to 16.</param>
+    /// <param name="rings">The number of horizontal subdivisions for caps. Defaults to 8.</param>
+    /// <param name="localPosition">The local position offset. Defaults to origin.</param>
+    /// <param name="localRotation">The local rotation. Defaults to identity.</param>
     public Capsule(
         float radius,
         float height,
