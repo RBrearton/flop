@@ -16,10 +16,10 @@ public interface IGeometryComponent
     /// <summary>
     /// Return the bounding box for this geometry module.
     /// </summary>
-    Box GetBoundingBox();
+    Box BoundingBox { get; }
 
     /// <summary>
     /// Return the center point for this geometry module.
     /// </summary>
-    Vector3 GetCenter() => GetBoundingBox().Size / 2;
+    Vector3 Center => BoundingBox.Size / 2;
 }
