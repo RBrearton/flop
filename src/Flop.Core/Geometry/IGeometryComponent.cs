@@ -22,4 +22,14 @@ public interface IGeometryComponent
     /// Return the center point for this geometry module.
     /// </summary>
     Vector3 Center => BoundingBox.Size / 2;
+
+    /// <summary>
+    /// The local position of this geometry module.
+    /// </summary>
+    Vector3 LocalPosition { get; }
+
+    /// <summary>
+    /// The local rotation of this geometry module.
+    /// </summary>
+    Quaternion LocalRotation { get; }
 }
