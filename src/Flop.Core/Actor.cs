@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Flop.Core.Geometry;
+using Flop.Core.Geometry.Primitives;
 
 namespace Flop.Core;
 
@@ -12,12 +13,17 @@ public abstract class Actor
     public abstract IGeometryRig GeometryRig { get; }
 
     /// <summary>
+    /// The actor's bounding box in the game world.
+    /// </summary>
+    public Box BoundingBox => GeometryRig.BoundingBox;
+
+    /// <summary>
     /// The actor's absolute position in the game world.
     /// </summary>
-    public abstract Vector3 Position { get; }
+    public Vector3 Position { get; }
 
     /// <summary>
     /// The actor's absolute rotation in the game world.
     /// </summary>
-    public abstract Quaternion Rotation { get; }
+    public Quaternion Rotation { get; }
 }
