@@ -42,10 +42,7 @@ public readonly record struct Box : IGeometryComponent
     ) => new(size, size, size, localPosition, localRotation);
 
     #region IGeometryComponent
-    public Mesh GetMesh()
-    {
-        return new Mesh();
-    }
+    public Mesh GetMesh() => Raylib.GenMeshCube(SizeX, SizeY, SizeZ);
 
     public Box BoundingBox => this;
     #endregion
