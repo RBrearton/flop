@@ -37,13 +37,7 @@ public readonly record struct Capsule : IGeometryComponent
     }
 
     #region IGeometryComponent
-    public Mesh GetMesh()
-    {
-        // Capsule has no single mesh - it's composed of children
-        return new Mesh();
-    }
-
-    public IReadOnlyList<IGeometryComponent> Children
+    public IReadOnlyList<IGeometryPrimitive> Primitives
     {
         get
         {

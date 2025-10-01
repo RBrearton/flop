@@ -6,7 +6,7 @@ namespace Flop.Core.Geometry;
 /// <summary>
 /// A geometry component representing a sphere.
 /// </summary>
-public readonly record struct Sphere : IGeometryComponent
+public readonly record struct Sphere : IGeometryPrimitive
 {
     public float Radius { get; init; }
     public int Rings { get; init; }

@@ -6,7 +6,7 @@ namespace Flop.Core.Geometry;
 /// <summary>
 /// A very simple geometry component representing a box/cuboid.
 /// </summary>
-public readonly record struct Box : IGeometryComponent
+public readonly record struct Box : IGeometryPrimitive
 {
     public Vector3 Size { get; init; }
     public Vector3 LocalPosition { get; init; }

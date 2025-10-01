@@ -1,40 +1,30 @@
 using System.Numerics;
-using Raylib_cs;
 
 namespace Flop.Core.Geometry;
 
 /// <summary>
-/// Interface specifying what we expect from an individual component of our modular geometry system.
+/// Interface for a geometry component - a collection of primitives forming a rigid body.
+/// Examples: sword, shield, character torso.
 /// </summary>
 public interface IGeometryComponent
 {
     /// <summary>
-    /// Return the Raylib Mesh for this geometry module.
+    /// The geometry primitives that make up this component.
     /// </summary>
-    Mesh GetMesh();
+    IReadOnlyList<IGeometryPrimitive> Primitives { get; }
 
     /// <summary>
-    /// Child geometry components that are part of this geometry.
-    /// </summary>
-    IReadOnlyList<IGeometryComponent> Children => [];
-
-    /// <summary>
-    /// Return the bounding box for this geometry module.
+    /// Return the bounding box for this geometry component.
     /// </summary>
     Box BoundingBox { get; }
 
     /// <summary>
-    /// Return the center point for this geometry module.
-    /// </summary>
-    Vector3 Center => BoundingBox.Size / 2;
-
-    /// <summary>
-    /// The local position of this geometry module.
+    /// The local position of this geometry component.
     /// </summary>
     Vector3 LocalPosition { get; }
 
     /// <summary>
-    /// The local rotation of this geometry module.
+    /// The local rotation of this geometry component.
     /// </summary>
     Quaternion LocalRotation { get; }
 }

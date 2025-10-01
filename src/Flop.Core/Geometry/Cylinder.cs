@@ -6,7 +6,7 @@ namespace Flop.Core.Geometry;
 /// <summary>
 /// A geometry component representing a cylinder.
 /// </summary>
-public readonly record struct Cylinder : IGeometryComponent
+public readonly record struct Cylinder : IGeometryPrimitive
 {
     public float Radius { get; init; }
     public float Height { get; init; }
