@@ -1,5 +1,6 @@
 using System.Numerics;
 using Flop.Core.Geometry;
+using Flop.Core.Geometry.Primitives;
 using Flop.Core.Tests.Mocks;
 
 namespace Flop.Core.Tests;

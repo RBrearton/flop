@@ -1,4 +1,5 @@
-using Flop.Core.Geometry;
+using Flop.Core.Geometry.Components;
+using Flop.Core.Geometry.Primitives;
 
 namespace Flop.Core.Tests.Geometry;
 
