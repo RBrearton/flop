@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace Flop.Core.Geometry;
+namespace Flop.Core.Geometry.Primitives;
 
 /// <summary>
 /// A very simple geometry component representing a box/cuboid.

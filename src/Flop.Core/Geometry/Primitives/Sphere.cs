@@ -1,7 +1,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace Flop.Core.Geometry;
+namespace Flop.Core.Geometry.Primitives;
 
 /// <summary>
 /// A geometry component representing a sphere.
@@ -32,8 +32,7 @@ public readonly record struct Sphere : IGeometryPrimitive
     }
 
     #region IGeometryPrimitive
-    public Mesh GetMesh(IMeshGenerator generator) =>
-        generator.GenMeshSphere(Radius, Rings, Slices);
+    public Mesh GetMesh(IMeshGenerator generator) => generator.GenMeshSphere(Radius, Rings, Slices);
 
     public Box BoundingBox =>
         new(new Vector3(Diameter, Diameter, Diameter), LocalPosition, LocalRotation);
