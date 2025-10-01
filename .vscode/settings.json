@@ -3,7 +3,9 @@
         100
     ],
     "cSpell.words": [
+        "bbox",
         "Imgui",
-        "Raylib"
+        "Raylib",
+        "Xunit"
     ]
 }
