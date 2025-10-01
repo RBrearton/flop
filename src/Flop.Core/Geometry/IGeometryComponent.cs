@@ -14,6 +14,11 @@ public interface IGeometryComponent
     Mesh GetMesh();
 
     /// <summary>
+    /// Child geometry components that are part of this geometry.
+    /// </summary>
+    IReadOnlyList<IGeometryComponent> Children => [];
+
+    /// <summary>
     /// Return the bounding box for this geometry module.
     /// </summary>
     Box BoundingBox { get; }
