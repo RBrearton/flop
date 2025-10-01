@@ -8,10 +8,14 @@ namespace Flop.Core;
 /// Ensures identical primitives share the same GPU-uploaded mesh.
 /// Tracks reference counts for automatic cleanup.
 /// </summary>
-public class MeshManager : IDisposable
+public class MeshManager(IMeshUploader uploader) : IDisposable
 {
     private readonly Dictionary<MeshHandle, Mesh> _meshCache = [];
     private readonly Dictionary<MeshHandle, int> _refCounts = [];
+    private readonly IMeshUploader _uploader = uploader;
+
+    public MeshManager()
+        : this(new RaylibMeshUploader()) { }
 
     /// <summary>
     /// Get or create a mesh for the given primitive.
@@ -25,7 +29,7 @@ public class MeshManager : IDisposable
         if (!_meshCache.TryGetValue(handle, out Mesh value))
         {
             var mesh = primitive.GetMesh();
-            Raylib.UploadMesh(ref mesh, false);
+            _uploader.Upload(ref mesh);
             value = mesh;
             _meshCache[handle] = value;
             _refCounts[handle] = 0;
@@ -52,7 +56,7 @@ public class MeshManager : IDisposable
 
         if (value == 0)
         {
-            Raylib.UnloadMesh(_meshCache[handle]);
+            _uploader.Unload(_meshCache[handle]);
             _meshCache.Remove(handle);
             _refCounts.Remove(handle);
         }
@@ -104,7 +108,7 @@ public class MeshManager : IDisposable
     {
         foreach (var mesh in _meshCache.Values)
         {
-            Raylib.UnloadMesh(mesh);
+            _uploader.Unload(mesh);
         }
 
         _meshCache.Clear();
