@@ -41,8 +41,8 @@ public readonly record struct Box : IGeometryPrimitive
         Quaternion localRotation = default
     ) => new(size, size, size, localPosition, localRotation);
 
-    #region IGeometryComponent
-    public Mesh GetMesh() => Raylib.GenMeshCube(SizeX, SizeY, SizeZ);
+    #region IGeometryPrimitive
+    public Mesh GetMesh(IMeshGenerator generator) => generator.GenMeshCube(SizeX, SizeY, SizeZ);
 
     public Box BoundingBox => this;
     #endregion

@@ -31,8 +31,9 @@ public readonly record struct Hemisphere : IGeometryPrimitive
         LocalRotation = localRotation == default ? Quaternion.Identity : localRotation;
     }
 
-    #region IGeometryComponent
-    public Mesh GetMesh() => Raylib.GenMeshHemiSphere(Radius, Rings, Slices);
+    #region IGeometryPrimitive
+    public Mesh GetMesh(IMeshGenerator generator) =>
+        generator.GenMeshHemiSphere(Radius, Rings, Slices);
 
     public Box BoundingBox =>
         new(new Vector3(Diameter, Radius, Diameter), LocalPosition, LocalRotation);

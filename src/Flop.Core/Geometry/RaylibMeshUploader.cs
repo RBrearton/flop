@@ -1,6 +1,6 @@
 using Raylib_cs;
 
-namespace Flop.Core;
+namespace Flop.Core.Geometry;
 
 /// <summary>
 /// Raylib implementation of IMeshUploader.

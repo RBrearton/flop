@@ -31,8 +31,9 @@ public readonly record struct Cylinder : IGeometryPrimitive
         LocalRotation = localRotation == default ? Quaternion.Identity : localRotation;
     }
 
-    #region IGeometryComponent
-    public Mesh GetMesh() => Raylib.GenMeshCylinder(Radius, Height, Slices);
+    #region IGeometryPrimitive
+    public Mesh GetMesh(IMeshGenerator generator) =>
+        generator.GenMeshCylinder(Radius, Height, Slices);
 
     public Box BoundingBox =>
         new(new Vector3(Diameter, Height, Diameter), LocalPosition, LocalRotation);

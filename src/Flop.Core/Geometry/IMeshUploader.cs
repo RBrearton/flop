@@ -1,6 +1,6 @@
 using Raylib_cs;
 
-namespace Flop.Core;
+namespace Flop.Core.Geometry;
 
 /// <summary>
 /// Interface for uploading and unloading meshes to/from GPU.

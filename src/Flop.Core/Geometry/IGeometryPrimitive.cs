@@ -12,8 +12,10 @@ public interface IGeometryPrimitive
 {
     /// <summary>
     /// Return the Raylib Mesh for this geometry module.
+    /// This method requires an IMeshGenerator implementation to help with the low-level mesh
+    /// generation.
     /// </summary>
-    Mesh GetMesh();
+    Mesh GetMesh(IMeshGenerator generator);
 
     /// <summary>
     /// Return the bounding box for this geometry module.

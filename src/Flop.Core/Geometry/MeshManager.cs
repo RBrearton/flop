@@ -1,21 +1,21 @@
-using Flop.Core.Geometry;
 using Raylib_cs;
 
-namespace Flop.Core;
+namespace Flop.Core.Geometry;
 
 /// <summary>
 /// Manages mesh caching and GPU lifecycle.
 /// Ensures identical primitives share the same GPU-uploaded mesh.
 /// Tracks reference counts for automatic cleanup.
 /// </summary>
-public class MeshManager(IMeshUploader uploader) : IDisposable
+public class MeshManager(IMeshUploader uploader, IMeshGenerator generator) : IDisposable
 {
     private readonly Dictionary<MeshHandle, Mesh> _meshCache = [];
     private readonly Dictionary<MeshHandle, int> _refCounts = [];
     private readonly IMeshUploader _uploader = uploader;
+    private readonly IMeshGenerator _generator = generator;
 
     public MeshManager()
-        : this(new RaylibMeshUploader()) { }
+        : this(new RaylibMeshUploader(), new RaylibMeshGenerator()) { }
 
     /// <summary>
     /// Get or create a mesh for the given primitive.
@@ -28,7 +28,7 @@ public class MeshManager(IMeshUploader uploader) : IDisposable
 
         if (!_meshCache.TryGetValue(handle, out Mesh value))
         {
-            var mesh = primitive.GetMesh();
+            var mesh = primitive.GetMesh(_generator);
             _uploader.Upload(ref mesh);
             value = mesh;
             _meshCache[handle] = value;
