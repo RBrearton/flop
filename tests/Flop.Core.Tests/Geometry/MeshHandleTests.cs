@@ -6,7 +6,7 @@ namespace Flop.Core.Tests.Geometry;
 
 public class MeshHandleTests
 {
-    private static readonly MaterialHandle TestMaterial = new("Test");
+    private static readonly Material TestMaterial = Material.Default;
 
     [Fact]
     public void IdenticalBoxes_ProduceSameHandle()
