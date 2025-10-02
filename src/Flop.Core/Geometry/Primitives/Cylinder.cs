@@ -26,7 +26,7 @@ public readonly record struct Cylinder : IGeometryPrimitive
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
-    public MaterialHandle Material { get; init; }
+    public Material Material { get; init; }
 
     /// <summary>
     /// The diameter of the cylinder (2 * Radius).
@@ -38,14 +38,14 @@ public readonly record struct Cylinder : IGeometryPrimitive
     /// </summary>
     /// <param name="radius">The radius of the cylinder.</param>
     /// <param name="height">The height of the cylinder.</param>
-    /// <param name="material">The material handle for this cylinder.</param>
+    /// <param name="material">The material for this cylinder.</param>
     /// <param name="slices">The number of circumferential subdivisions. Defaults to 16.</param>
     /// <param name="localPosition">The local position offset. Defaults to origin.</param>
     /// <param name="localRotation">The local rotation. Defaults to identity.</param>
     public Cylinder(
         float radius,
         float height,
-        MaterialHandle material,
+        Material material,
         int slices = 16,
         Vector3 localPosition = default,
         Quaternion localRotation = default

@@ -27,7 +27,7 @@ public readonly record struct Sphere : IGeometryPrimitive
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
-    public MaterialHandle Material { get; init; }
+    public Material Material { get; init; }
 
     /// <summary>
     /// The diameter of the sphere (2 * Radius).
@@ -38,14 +38,14 @@ public readonly record struct Sphere : IGeometryPrimitive
     /// Create a sphere with the specified dimensions.
     /// </summary>
     /// <param name="radius">The radius of the sphere.</param>
-    /// <param name="material">The material handle for this sphere.</param>
+    /// <param name="material">The material for this sphere.</param>
     /// <param name="rings">The number of horizontal subdivisions. Defaults to 16.</param>
     /// <param name="slices">The number of vertical subdivisions. Defaults to 16.</param>
     /// <param name="localPosition">The local position offset. Defaults to origin.</param>
     /// <param name="localRotation">The local rotation. Defaults to identity.</param>
     public Sphere(
         float radius,
-        MaterialHandle material,
+        Material material,
         int rings = 16,
         int slices = 16,
         Vector3 localPosition = default,

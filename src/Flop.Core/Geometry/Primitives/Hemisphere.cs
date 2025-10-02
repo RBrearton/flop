@@ -28,7 +28,7 @@ public readonly record struct Hemisphere : IGeometryPrimitive
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
-    public MaterialHandle Material { get; init; }
+    public Material Material { get; init; }
 
     /// <summary>
     /// The diameter of the hemisphere's base (2 * Radius).
@@ -39,14 +39,14 @@ public readonly record struct Hemisphere : IGeometryPrimitive
     /// Create a hemisphere with the specified dimensions.
     /// </summary>
     /// <param name="radius">The radius of the hemisphere.</param>
-    /// <param name="material">The material handle for this hemisphere.</param>
+    /// <param name="material">The material for this hemisphere.</param>
     /// <param name="rings">The number of horizontal subdivisions.</param>
     /// <param name="slices">The number of vertical subdivisions.</param>
     /// <param name="localPosition">The local position offset. Defaults to origin.</param>
     /// <param name="localRotation">The local rotation. Defaults to identity.</param>
     public Hemisphere(
         float radius,
-        MaterialHandle material,
+        Material material,
         int rings = 16,
         int slices = 16,
         Vector3 localPosition = default,

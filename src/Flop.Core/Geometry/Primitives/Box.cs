@@ -15,7 +15,7 @@ public readonly record struct Box : IGeometryPrimitive
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
-    public MaterialHandle Material { get; init; }
+    public Material Material { get; init; }
 
     /// <summary>
     /// The width of the box (X dimension).
@@ -41,7 +41,7 @@ public readonly record struct Box : IGeometryPrimitive
     /// <param name="localRotation">The local rotation. Defaults to identity.</param>
     public Box(
         Vector3 size,
-        MaterialHandle material,
+        Material material,
         Vector3 localPosition = default,
         Quaternion localRotation = default
     )
@@ -65,7 +65,7 @@ public readonly record struct Box : IGeometryPrimitive
         float size_x,
         float size_y,
         float size_z,
-        MaterialHandle material,
+        Material material,
         Vector3 localPosition = default,
         Quaternion localRotation = default
     )
@@ -81,7 +81,7 @@ public readonly record struct Box : IGeometryPrimitive
     /// <returns>A box with equal dimensions on all axes.</returns>
     public static Box Cube(
         float size,
-        MaterialHandle material,
+        Material material,
         Vector3 localPosition = default,
         Quaternion localRotation = default
     ) => new(size, size, size, material, localPosition, localRotation);

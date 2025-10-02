@@ -34,7 +34,7 @@ public readonly record struct Capsule : IGeometryComponent
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
-    public MaterialHandle Material { get; init; }
+    public Material Material { get; init; }
 
     /// <summary>
     /// The diameter of the capsule (2 * Radius).
@@ -52,7 +52,7 @@ public readonly record struct Capsule : IGeometryComponent
     /// </summary>
     /// <param name="radius">The radius of the capsule.</param>
     /// <param name="height">The height of the cylindrical body (excluding caps).</param>
-    /// <param name="material">The material handle for all parts of this capsule.</param>
+    /// <param name="material">The material for all parts of this capsule.</param>
     /// <param name="slices">The number of vertical subdivisions. Defaults to 16.</param>
     /// <param name="rings">The number of horizontal subdivisions for caps. Defaults to 8.</param>
     /// <param name="localPosition">The local position offset. Defaults to origin.</param>
@@ -60,7 +60,7 @@ public readonly record struct Capsule : IGeometryComponent
     public Capsule(
         float radius,
         float height,
-        MaterialHandle material,
+        Material material,
         int slices = 16,
         int rings = 8,
         Vector3 localPosition = default,

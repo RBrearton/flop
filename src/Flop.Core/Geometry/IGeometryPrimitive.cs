@@ -39,8 +39,8 @@ public interface IGeometryPrimitive
     Quaternion LocalRotation { get; }
 
     /// <summary>
-    /// The material handle for this primitive.
-    /// Used for render batching and material lookup.
+    /// The material for this primitive.
+    /// Contains rendering properties like color (and eventually textures, shaders, etc.).
     /// </summary>
-    MaterialHandle Material { get; }
+    Material Material { get; }
 }
