@@ -1,4 +1,4 @@
-namespace Flop.Client;
+namespace Flop.Core.Geometry;
 
 /// <summary>
 /// A handle uniquely identifying a material for rendering.

@@ -37,4 +37,10 @@ public interface IGeometryPrimitive
     /// The local rotation of this geometry module.
     /// </summary>
     Quaternion LocalRotation { get; }
+
+    /// <summary>
+    /// The material handle for this primitive.
+    /// Used for render batching and material lookup.
+    /// </summary>
+    MaterialHandle Material { get; }
 }

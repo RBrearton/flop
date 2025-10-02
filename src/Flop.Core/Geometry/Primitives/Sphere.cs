@@ -27,6 +27,7 @@ public readonly record struct Sphere : IGeometryPrimitive
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
+    public MaterialHandle Material { get; init; }
 
     /// <summary>
     /// The diameter of the sphere (2 * Radius).
@@ -37,12 +38,14 @@ public readonly record struct Sphere : IGeometryPrimitive
     /// Create a sphere with the specified dimensions.
     /// </summary>
     /// <param name="radius">The radius of the sphere.</param>
+    /// <param name="material">The material handle for this sphere.</param>
     /// <param name="rings">The number of horizontal subdivisions. Defaults to 16.</param>
     /// <param name="slices">The number of vertical subdivisions. Defaults to 16.</param>
     /// <param name="localPosition">The local position offset. Defaults to origin.</param>
     /// <param name="localRotation">The local rotation. Defaults to identity.</param>
     public Sphere(
         float radius,
+        MaterialHandle material,
         int rings = 16,
         int slices = 16,
         Vector3 localPosition = default,
@@ -50,6 +53,7 @@ public readonly record struct Sphere : IGeometryPrimitive
     )
     {
         Radius = radius;
+        Material = material;
         Rings = rings;
         Slices = slices;
         LocalPosition = localPosition == default ? Vector3.Zero : localPosition;
@@ -60,6 +64,6 @@ public readonly record struct Sphere : IGeometryPrimitive
     public Mesh GetMesh(IMeshGenerator generator) => generator.GenMeshSphere(Radius, Rings, Slices);
 
     public Box BoundingBox =>
-        new(new Vector3(Diameter, Diameter, Diameter), LocalPosition, LocalRotation);
+        new(new Vector3(Diameter, Diameter, Diameter), Material, LocalPosition, LocalRotation);
     #endregion
 }
