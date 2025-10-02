@@ -28,4 +28,19 @@ public interface IGeometryRig
     /// The rotation of this rig in world space.
     /// </summary>
     Quaternion Rotation { get; }
+
+    /// <summary>
+    /// Recursively flatten this rig to all constituent primitives.
+    /// </summary>
+    /// <returns>All primitives in all components of this rig.</returns>
+    IEnumerable<IGeometryPrimitive> AllPrimitives()
+    {
+        foreach (var component in Components)
+        {
+            foreach (var primitive in component.Primitives)
+            {
+                yield return primitive;
+            }
+        }
+    }
 }
