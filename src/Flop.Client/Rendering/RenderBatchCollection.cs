@@ -12,13 +12,15 @@ public class RenderBatchCollection
     private readonly Dictionary<(MeshHandle, MaterialHandle), RenderBatch> _batches = [];
 
     /// <summary>
-    /// Add a primitive to the collection with its world transform.
+    /// Add an instance to the collection with its mesh/material handles and world transform.
     /// Automatically groups it into the appropriate batch.
     /// </summary>
-    public void AddPrimitive(IGeometryPrimitive primitive, Matrix4x4 worldTransform)
+    public void AddInstance(
+        MeshHandle meshHandle,
+        MaterialHandle materialHandle,
+        Matrix4x4 worldTransform
+    )
     {
-        var meshHandle = new MeshHandle(primitive);
-        var materialHandle = new MaterialHandle(primitive.Material);
         var key = (meshHandle, materialHandle);
 
         if (!_batches.TryGetValue(key, out var batch))

@@ -1,16 +1,24 @@
 using System.Numerics;
 using Flop.Client.Rendering;
+using Flop.Core;
 using Flop.Core.Geometry;
+using Flop.Core.Geometry.Primitives;
 
 namespace Flop.Client.Tests.Rendering;
 
 public class RenderBatchTests
 {
+    private static readonly IGeometryPrimitive TestPrimitive = new Box(
+        Vector3.One,
+        Material.Default
+    );
+    private static readonly Material TestMaterial = Material.Default;
+
     [Fact]
     public void Constructor_InitializesHandles()
     {
-        var meshHandle = new MeshHandle(0);
-        var materialHandle = new MaterialHandle(0);
+        var meshHandle = MeshHandle.FromHashCode(MeshManager.ComputeHash(TestPrimitive));
+        var materialHandle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
         var batch = new RenderBatch(meshHandle, materialHandle);
 
@@ -21,7 +29,10 @@ public class RenderBatchTests
     [Fact]
     public void Add_AddsTransformToBatch()
     {
-        var batch = new RenderBatch(new MeshHandle(0), new MaterialHandle(0));
+        var batch = new RenderBatch(
+            MeshHandle.FromHashCode(MeshManager.ComputeHash(TestPrimitive)),
+            MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial))
+        );
         var transform = Matrix4x4.CreateTranslation(1, 2, 3);
 
         batch.Add(transform);
@@ -33,7 +44,10 @@ public class RenderBatchTests
     [Fact]
     public void Add_AccumulatesMultipleTransforms()
     {
-        var batch = new RenderBatch(new MeshHandle(0), new MaterialHandle(0));
+        var batch = new RenderBatch(
+            MeshHandle.FromHashCode(MeshManager.ComputeHash(TestPrimitive)),
+            MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial))
+        );
         var transform1 = Matrix4x4.CreateTranslation(1, 2, 3);
         var transform2 = Matrix4x4.CreateTranslation(4, 5, 6);
         var transform3 = Matrix4x4.CreateTranslation(7, 8, 9);
@@ -51,7 +65,10 @@ public class RenderBatchTests
     [Fact]
     public void Clear_RemovesAllTransforms()
     {
-        var batch = new RenderBatch(new MeshHandle(0), new MaterialHandle(0));
+        var batch = new RenderBatch(
+            MeshHandle.FromHashCode(MeshManager.ComputeHash(TestPrimitive)),
+            MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial))
+        );
         batch.Add(Matrix4x4.CreateTranslation(1, 2, 3));
         batch.Add(Matrix4x4.CreateTranslation(4, 5, 6));
 
@@ -63,7 +80,10 @@ public class RenderBatchTests
     [Fact]
     public void Transforms_IsReadOnly()
     {
-        var batch = new RenderBatch(new MeshHandle(0), new MaterialHandle(0));
+        var batch = new RenderBatch(
+            MeshHandle.FromHashCode(MeshManager.ComputeHash(TestPrimitive)),
+            MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial))
+        );
 
         // Verify the type is IReadOnlyList
         Assert.IsAssignableFrom<IReadOnlyList<Matrix4x4>>(batch.Transforms);

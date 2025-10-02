@@ -1,4 +1,5 @@
 using System.Numerics;
+using Flop.Core;
 using Flop.Core.Geometry;
 using Raylib_cs;
 
@@ -16,18 +17,18 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     private readonly RenderBatchCollection _batchCollection = new();
 
     /// <summary>
-    /// Render all geometry rigs using the given camera.
+    /// Render all renderables using the given camera.
     /// Builds batches, acquires meshes/materials, and renders via DrawMeshInstanced.
     /// </summary>
-    public void Render(IEnumerable<IGeometryRig> rigs, Camera3D camera)
+    public void Render(IEnumerable<Flop.Core.IRenderable> renderables, Camera3D camera)
     {
         // Clear previous frame's batches.
         _batchCollection.Clear();
 
-        // Build batches from all rigs.
-        foreach (var rig in rigs)
+        // Build batches from all renderables.
+        foreach (var renderable in renderables)
         {
-            BuildBatches(rig);
+            BuildBatches(renderable);
         }
 
         // Begin 3D rendering.
@@ -36,9 +37,9 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
         // Render all batches.
         foreach (var batch in _batchCollection.GetBatches())
         {
-            // Get or create mesh and material from managers.
-            var mesh = GetMeshFromHandle(batch.MeshHandle);
-            var material = GetMaterialFromHandle(batch.MaterialHandle);
+            // Get mesh and material from managers using handles.
+            var mesh = _meshManager.GetMesh(batch.MeshHandle);
+            var material = _materialManager.GetMaterial(batch.MaterialHandle);
 
             // Render the batch
             batch.Draw(mesh, material);
@@ -48,15 +49,18 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     }
 
     /// <summary>
-    /// Build render batches from a geometry rig.
+    /// Build render batches from a renderable.
     /// Calculates world transforms for all primitives and adds them to batches.
     /// </summary>
-    private void BuildBatches(IGeometryRig rig)
+    private void BuildBatches(Flop.Core.IRenderable renderable)
     {
-        // Rig world transform.
-        var rigWorldTransform = CreateTransformMatrix(rig.Position, rig.Rotation);
+        // Renderable world transform.
+        var rigWorldTransform = CreateTransformMatrix(
+            ((IHasPlacement)renderable).Position,
+            ((IHasPlacement)renderable).Rotation
+        );
 
-        foreach (var component in rig.Components)
+        foreach (var component in renderable.Components)
         {
             // Component local transform.
             var componentLocalTransform = CreateTransformMatrix(
@@ -76,7 +80,13 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
                 var worldTransform =
                     primitiveLocalTransform * componentLocalTransform * rigWorldTransform;
 
-                _batchCollection.AddPrimitive(primitive, worldTransform);
+                // Compute handles for batching (primitives should already be uploaded via World.AddActor).
+                var meshHash = MeshManager.ComputeHash(primitive);
+                var materialHash = MaterialManager.ComputeHash(primitive.Material);
+                var meshHandle = MeshHandle.FromHashCode(meshHash);
+                var materialHandle = MaterialHandle.FromHashCode(materialHash);
+
+                _batchCollection.AddInstance(meshHandle, materialHandle, worldTransform);
             }
         }
     }
@@ -89,38 +99,6 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
         return Matrix4x4.CreateFromQuaternion(rotation) * Matrix4x4.CreateTranslation(position);
     }
 
-    /// <summary>
-    /// Get a mesh from the mesh manager. Creates and uploads if necessary.
-    /// Note: This is a temporary solution. Ideally we'd acquire meshes upfront
-    /// and track their lifecycle properly.
-    /// </summary>
-    private Mesh GetMeshFromHandle(MeshHandle handle)
-    {
-        // This is a simplified approach - we need to find the primitive associated with this
-        // handle.
-        // For now, this is a placeholder that will be addressed when we integrate with actual
-        // actors.
-        throw new NotImplementedException(
-            "GetMeshFromHandle requires primitive lookup. "
-                + "This will be implemented when integrating with actual actor system."
-        );
-    }
-
-    /// <summary>
-    /// Get a material from the material manager. Creates and loads if necessary.
-    /// Note: This is a temporary solution. Ideally we'd acquire materials upfront
-    /// and track their lifecycle properly.
-    /// </summary>
-    private Material GetMaterialFromHandle(MaterialHandle handle)
-    {
-        // This is a simplified approach - we need to find the material associated with this handle.
-        // For now, this is a placeholder that will be addressed when we integrate with actual
-        // actors.
-        throw new NotImplementedException(
-            "GetMaterialFromHandle requires material lookup. "
-                + "This will be implemented when integrating with actual actor system."
-        );
-    }
 
     /// <summary>
     /// Clear all cached meshes and materials.

@@ -18,24 +18,55 @@ public class MaterialManager(IMaterialLoader loader) : IDisposable
         : this(new RaylibMaterialLoader()) { }
 
     /// <summary>
-    /// Get or create a material for the given Flop material.
+    /// Upload a material to the GPU.
     /// If the material doesn't exist, it will be created and loaded to the GPU.
     /// Increments the reference count.
+    /// Returns the handle that can be used to retrieve the material.
     /// </summary>
-    public Material GetOrCreate(Flop.Core.Material material)
+    public MaterialHandle UploadMaterial(Flop.Core.Material material)
     {
-        MaterialHandle handle = new(material);
+        var hash = ComputeHash(material);
+        MaterialHandle handle = MaterialHandle.FromHashCode(hash);
 
-        if (!_materialCache.TryGetValue(handle, out Material value))
+        if (!_materialCache.TryGetValue(handle, out Material _))
         {
             var raylibMaterial = _loader.LoadMaterial(material.Color);
-            value = raylibMaterial;
-            _materialCache[handle] = value;
+            _materialCache[handle] = raylibMaterial;
             _refCounts[handle] = 0;
         }
 
         _refCounts[handle]++;
-        return value;
+        return handle;
+    }
+
+    /// <summary>
+    /// Compute a deterministic hash for a material based on its properties.
+    /// Identical materials will produce the same hash, enabling deduplication.
+    /// </summary>
+    public static int ComputeHash(Flop.Core.Material material)
+    {
+        return HashCode.Combine(
+            material.Color.R,
+            material.Color.G,
+            material.Color.B,
+            material.Color.A
+        );
+    }
+
+    /// <summary>
+    /// Get the GPU material corresponding to the given handle.
+    /// Throws if the handle has not been uploaded.
+    /// </summary>
+    public Material GetMaterial(MaterialHandle handle)
+    {
+        if (!_materialCache.TryGetValue(handle, out Material material))
+        {
+            throw new InvalidOperationException(
+                $"Material handle {handle} has not been uploaded. Call UploadMaterial first."
+            );
+        }
+
+        return material;
     }
 
     /// <summary>
@@ -74,7 +105,8 @@ public class MaterialManager(IMaterialLoader loader) : IDisposable
     /// </summary>
     public void Release(Flop.Core.Material material)
     {
-        Release(new MaterialHandle(material));
+        var hash = ComputeHash(material);
+        Release(MaterialHandle.FromHashCode(hash));
     }
 
     /// <summary>

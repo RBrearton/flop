@@ -14,8 +14,8 @@ public class MeshHandleTests
         var box1 = new Box(new Vector3(1, 2, 3), TestMaterial);
         var box2 = new Box(new Vector3(1, 2, 3), TestMaterial);
 
-        var handle1 = new MeshHandle(box1);
-        var handle2 = new MeshHandle(box2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(box1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(box2));
 
         Assert.Equal(handle1, handle2);
     }
@@ -26,8 +26,8 @@ public class MeshHandleTests
         var box1 = new Box(new Vector3(1, 2, 3), TestMaterial);
         var box2 = new Box(new Vector3(1, 2, 4), TestMaterial);
 
-        var handle1 = new MeshHandle(box1);
-        var handle2 = new MeshHandle(box2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(box1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(box2));
 
         Assert.NotEqual(handle1, handle2);
     }
@@ -38,8 +38,8 @@ public class MeshHandleTests
         var cylinder1 = new Cylinder(0.5f, 1.0f, TestMaterial, 16);
         var cylinder2 = new Cylinder(0.5f, 1.0f, TestMaterial, 16);
 
-        var handle1 = new MeshHandle(cylinder1);
-        var handle2 = new MeshHandle(cylinder2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(cylinder1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(cylinder2));
 
         Assert.Equal(handle1, handle2);
     }
@@ -50,8 +50,8 @@ public class MeshHandleTests
         var cylinder1 = new Cylinder(0.5f, 1.0f, TestMaterial, 16);
         var cylinder2 = new Cylinder(0.6f, 1.0f, TestMaterial, 16);
 
-        var handle1 = new MeshHandle(cylinder1);
-        var handle2 = new MeshHandle(cylinder2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(cylinder1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(cylinder2));
 
         Assert.NotEqual(handle1, handle2);
     }
@@ -62,8 +62,8 @@ public class MeshHandleTests
         var sphere1 = new Sphere(0.5f, TestMaterial, 16, 16);
         var sphere2 = new Sphere(0.5f, TestMaterial, 16, 16);
 
-        var handle1 = new MeshHandle(sphere1);
-        var handle2 = new MeshHandle(sphere2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(sphere1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(sphere2));
 
         Assert.Equal(handle1, handle2);
     }
@@ -74,8 +74,8 @@ public class MeshHandleTests
         var hemisphere_1 = new Hemisphere(0.5f, TestMaterial, 16, 16);
         var hemisphere_2 = new Hemisphere(0.5f, TestMaterial, 16, 16);
 
-        var handle1 = new MeshHandle(hemisphere_1);
-        var handle2 = new MeshHandle(hemisphere_2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(hemisphere_1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(hemisphere_2));
 
         Assert.Equal(handle1, handle2);
     }
@@ -86,8 +86,8 @@ public class MeshHandleTests
         var box = new Box(new Vector3(1, 1, 1), TestMaterial);
         var sphere = new Sphere(0.5f, TestMaterial);
 
-        var handleBox = new MeshHandle(box);
-        var handleSphere = new MeshHandle(sphere);
+        var handleBox = MeshHandle.FromHashCode(MeshManager.ComputeHash(box));
+        var handleSphere = MeshHandle.FromHashCode(MeshManager.ComputeHash(sphere));
 
         Assert.NotEqual(handleBox, handleSphere);
     }
@@ -96,10 +96,10 @@ public class MeshHandleTests
     public void InterfaceConstructor_WorksCorrectly()
     {
         IGeometryPrimitive primitive = new Cylinder(0.5f, 1.0f, TestMaterial, 16);
-        var handleFromInterface = new MeshHandle(primitive);
+        var handleFromInterface = MeshHandle.FromHashCode(MeshManager.ComputeHash(primitive));
 
         var cylinder = new Cylinder(0.5f, 1.0f, TestMaterial, 16);
-        var handleFromConcrete = new MeshHandle(cylinder);
+        var handleFromConcrete = MeshHandle.FromHashCode(MeshManager.ComputeHash(cylinder));
 
         Assert.Equal(handleFromInterface, handleFromConcrete);
     }
@@ -115,8 +115,8 @@ public class MeshHandleTests
             Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI)
         );
 
-        var handle1 = new MeshHandle(box1);
-        var handle2 = new MeshHandle(box2);
+        var handle1 = MeshHandle.FromHashCode(MeshManager.ComputeHash(box1));
+        var handle2 = MeshHandle.FromHashCode(MeshManager.ComputeHash(box2));
 
         // Position/rotation shouldn't affect mesh identity
         Assert.Equal(handle1, handle2);

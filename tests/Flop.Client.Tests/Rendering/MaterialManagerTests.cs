@@ -10,43 +10,80 @@ public class MaterialManagerTests
     private static readonly Material TestMaterial = Material.Default;
 
     [Fact]
-    public void GetOrCreate_LoadsMaterialOnFirstCall()
+    public void UploadMaterial_LoadsMaterialOnFirstCall()
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
 
         Assert.Equal(1, loader.LoadCount);
     }
 
     [Fact]
-    public void GetOrCreate_DoesNotLoadOnSecondCall()
+    public void UploadMaterial_DoesNotLoadOnSecondCall()
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
 
-        manager.GetOrCreate(TestMaterial);
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
 
         Assert.Equal(1, loader.LoadCount);
     }
 
     [Fact]
-    public void GetOrCreate_IncrementsRefCount()
+    public void UploadMaterial_IncrementsRefCount()
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         Assert.Equal(1, manager.GetRefCount(handle));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         Assert.Equal(2, manager.GetRefCount(handle));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         Assert.Equal(3, manager.GetRefCount(handle));
+    }
+
+    [Fact]
+    public void UploadMaterial_ReturnsCorrectHandle()
+    {
+        var loader = new MockMaterialLoader();
+        var manager = new MaterialManager(loader);
+        var expectedHandle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
+
+        var handle = manager.UploadMaterial(TestMaterial);
+
+        Assert.Equal(expectedHandle, handle);
+    }
+
+    [Fact]
+    public void GetMaterial_ReturnsMaterialForUploadedHandle()
+    {
+        var loader = new MockMaterialLoader();
+        var manager = new MaterialManager(loader);
+
+        var handle = manager.UploadMaterial(TestMaterial);
+
+        // Should not throw
+        manager.GetMaterial(handle);
+    }
+
+    [Fact]
+    public void GetMaterial_ThrowsForNonUploadedHandle()
+    {
+        var loader = new MockMaterialLoader();
+        var manager = new MaterialManager(loader);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => manager.GetMaterial(handle)
+        );
+        Assert.Contains("has not been uploaded", exception.Message);
     }
 
     [Fact]
@@ -54,10 +91,10 @@ public class MaterialManagerTests
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
-        manager.GetOrCreate(TestMaterial);
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         Assert.Equal(2, manager.GetRefCount(handle));
 
         manager.Release(handle);
@@ -69,9 +106,9 @@ public class MaterialManagerTests
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         manager.Release(handle);
 
         Assert.Equal(1, loader.UnloadCount);
@@ -84,7 +121,7 @@ public class MaterialManagerTests
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
         var exception = Assert.Throws<InvalidOperationException>(() => manager.Release(handle));
         Assert.Contains("never acquired", exception.Message);
@@ -95,9 +132,9 @@ public class MaterialManagerTests
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         manager.Release(handle);
 
         var exception = Assert.Throws<InvalidOperationException>(() => manager.Release(handle));
@@ -109,9 +146,9 @@ public class MaterialManagerTests
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         manager.Release(TestMaterial);
 
         Assert.Equal(1, loader.UnloadCount);
@@ -123,11 +160,11 @@ public class MaterialManagerTests
     {
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
-        var handle = new MaterialHandle(TestMaterial);
+        var handle = MaterialHandle.FromHashCode(MaterialManager.ComputeHash(TestMaterial));
 
         Assert.False(manager.IsCached(handle));
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         Assert.True(manager.IsCached(handle));
     }
 
@@ -139,14 +176,14 @@ public class MaterialManagerTests
 
         Assert.Equal(0, manager.CachedMaterialCount);
 
-        manager.GetOrCreate(TestMaterial);
+        manager.UploadMaterial(TestMaterial);
         Assert.Equal(1, manager.CachedMaterialCount);
 
-        manager.GetOrCreate(TestMaterial); // Same - no increase
+        manager.UploadMaterial(TestMaterial); // Same - no increase
         Assert.Equal(1, manager.CachedMaterialCount);
 
         var redMaterial = new Material(Color.Red);
-        manager.GetOrCreate(redMaterial); // Different
+        manager.UploadMaterial(redMaterial); // Different
         Assert.Equal(2, manager.CachedMaterialCount);
     }
 
@@ -156,9 +193,9 @@ public class MaterialManagerTests
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
 
-        manager.GetOrCreate(TestMaterial);
-        manager.GetOrCreate(new Material(Color.Red));
-        manager.GetOrCreate(new Material(Color.Green));
+        manager.UploadMaterial(TestMaterial);
+        manager.UploadMaterial(new Material(Color.Red));
+        manager.UploadMaterial(new Material(Color.Green));
 
         manager.Dispose();
 
@@ -175,8 +212,8 @@ public class MaterialManagerTests
         var material1 = new Material(Color.Red);
         var material2 = new Material(Color.Red);
 
-        manager.GetOrCreate(material1);
-        manager.GetOrCreate(material2);
+        manager.UploadMaterial(material1);
+        manager.UploadMaterial(material2);
 
         Assert.Equal(1, loader.LoadCount);
         Assert.Equal(1, manager.CachedMaterialCount);
@@ -188,8 +225,8 @@ public class MaterialManagerTests
         var loader = new MockMaterialLoader();
         var manager = new MaterialManager(loader);
 
-        manager.GetOrCreate(new Material(Color.Red));
-        manager.GetOrCreate(new Material(Color.Blue));
+        manager.UploadMaterial(new Material(Color.Red));
+        manager.UploadMaterial(new Material(Color.Blue));
 
         Assert.Equal(2, loader.LoadCount);
         Assert.Equal(2, manager.CachedMaterialCount);

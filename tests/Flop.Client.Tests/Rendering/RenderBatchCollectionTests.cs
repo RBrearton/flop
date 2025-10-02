@@ -1,5 +1,7 @@
 using System.Numerics;
 using Flop.Client.Rendering;
+using Flop.Core;
+using Flop.Core.Geometry;
 using Flop.Core.Geometry.Primitives;
 
 namespace Flop.Client.Tests.Rendering;
@@ -9,53 +11,56 @@ public class RenderBatchCollectionTests
     private static readonly Flop.Core.Material TestMaterial = Flop.Core.Material.Default;
 
     [Fact]
-    public void AddPrimitive_CreatesBatchForNewMeshMaterialPair()
+    public void AddInstance_CreatesBatchForNewMeshMaterialPair()
     {
         var collection = new RenderBatchCollection();
-        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
-        var transform = Matrix4x4.CreateTranslation(1, 2, 3);
+        var boxHandle = MeshHandle.FromHashCode(1);
+        var materialHandle = MaterialHandle.FromHashCode(1);
 
-        collection.AddPrimitive(box, transform);
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.Identity);
 
         Assert.Equal(1, collection.BatchCount);
     }
 
     [Fact]
-    public void AddPrimitive_ReusesBatchForSameMeshMaterialPair()
+    public void AddInstance_ReusesBatchForSameMeshMaterialPair()
     {
         var collection = new RenderBatchCollection();
-        var box1 = new Box(new Vector3(1, 2, 3), TestMaterial);
-        var box2 = new Box(new Vector3(1, 2, 3), TestMaterial); // Same dimensions and material
+        var box1Handle = MeshHandle.FromHashCode(1);
+        var box2Handle = MeshHandle.FromHashCode(1); // Same hash as box1
+        var materialHandle = MaterialHandle.FromHashCode(1);
 
-        collection.AddPrimitive(box1, Matrix4x4.CreateTranslation(1, 0, 0));
-        collection.AddPrimitive(box2, Matrix4x4.CreateTranslation(2, 0, 0));
+        collection.AddInstance(box1Handle, materialHandle, Matrix4x4.CreateTranslation(1, 0, 0));
+        collection.AddInstance(box2Handle, materialHandle, Matrix4x4.CreateTranslation(2, 0, 0));
 
         Assert.Equal(1, collection.BatchCount);
         Assert.Equal(2, collection.TotalInstanceCount);
     }
 
     [Fact]
-    public void AddPrimitive_CreatesSeparateBatchesForDifferentMeshes()
+    public void AddInstance_CreatesSeparateBatchesForDifferentMeshes()
     {
         var collection = new RenderBatchCollection();
-        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
-        var sphere = new Sphere(0.5f, TestMaterial);
+        var boxHandle = MeshHandle.FromHashCode(1);
+        var sphereHandle = MeshHandle.FromHashCode(2);
+        var materialHandle = MaterialHandle.FromHashCode(1);
 
-        collection.AddPrimitive(box, Matrix4x4.Identity);
-        collection.AddPrimitive(sphere, Matrix4x4.Identity);
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.Identity);
+        collection.AddInstance(sphereHandle, materialHandle, Matrix4x4.Identity);
 
         Assert.Equal(2, collection.BatchCount);
     }
 
     [Fact]
-    public void AddPrimitive_CreatesSeparateBatchesForDifferentMaterials()
+    public void AddInstance_CreatesSeparateBatchesForDifferentMaterials()
     {
         var collection = new RenderBatchCollection();
-        var redBox = new Box(new Vector3(1, 2, 3), new Flop.Core.Material(Flop.Core.Color.Red));
-        var blueBox = new Box(new Vector3(1, 2, 3), new Flop.Core.Material(Flop.Core.Color.Blue));
+        var boxHandle = MeshHandle.FromHashCode(1);
+        var redMaterialHandle = MaterialHandle.FromHashCode(1);
+        var blueMaterialHandle = MaterialHandle.FromHashCode(2);
 
-        collection.AddPrimitive(redBox, Matrix4x4.Identity);
-        collection.AddPrimitive(blueBox, Matrix4x4.Identity);
+        collection.AddInstance(boxHandle, redMaterialHandle, Matrix4x4.Identity);
+        collection.AddInstance(boxHandle, blueMaterialHandle, Matrix4x4.Identity);
 
         Assert.Equal(2, collection.BatchCount);
     }
@@ -64,29 +69,32 @@ public class RenderBatchCollectionTests
     public void TotalInstanceCount_SumsAllInstances()
     {
         var collection = new RenderBatchCollection();
-        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
-        var sphere = new Sphere(0.5f, TestMaterial);
+        var boxHandle = MeshHandle.FromHashCode(1);
+        var sphereHandle = MeshHandle.FromHashCode(2);
+        var materialHandle = MaterialHandle.FromHashCode(1);
 
         // 3 boxes
-        collection.AddPrimitive(box, Matrix4x4.CreateTranslation(0, 0, 0));
-        collection.AddPrimitive(box, Matrix4x4.CreateTranslation(1, 0, 0));
-        collection.AddPrimitive(box, Matrix4x4.CreateTranslation(2, 0, 0));
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.CreateTranslation(0, 0, 0));
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.CreateTranslation(1, 0, 0));
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.CreateTranslation(2, 0, 0));
 
         // 2 spheres
-        collection.AddPrimitive(sphere, Matrix4x4.CreateTranslation(0, 1, 0));
-        collection.AddPrimitive(sphere, Matrix4x4.CreateTranslation(1, 1, 0));
+        collection.AddInstance(sphereHandle, materialHandle, Matrix4x4.CreateTranslation(0, 1, 0));
+        collection.AddInstance(sphereHandle, materialHandle, Matrix4x4.CreateTranslation(1, 1, 0));
 
         Assert.Equal(5, collection.TotalInstanceCount);
+        Assert.Equal(2, collection.BatchCount);
     }
 
     [Fact]
     public void Clear_RemovesAllTransformsButKeepsBatches()
     {
         var collection = new RenderBatchCollection();
-        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
+        var boxHandle = MeshHandle.FromHashCode(1);
+        var materialHandle = MaterialHandle.FromHashCode(1);
 
-        collection.AddPrimitive(box, Matrix4x4.CreateTranslation(0, 0, 0));
-        collection.AddPrimitive(box, Matrix4x4.CreateTranslation(1, 0, 0));
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.CreateTranslation(0, 0, 0));
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.CreateTranslation(1, 0, 0));
 
         collection.Clear();
 
@@ -98,11 +106,12 @@ public class RenderBatchCollectionTests
     public void GetBatches_ReturnsAllBatches()
     {
         var collection = new RenderBatchCollection();
-        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
-        var sphere = new Sphere(0.5f, TestMaterial);
+        var boxHandle = MeshHandle.FromHashCode(1);
+        var materialHandle = MaterialHandle.FromHashCode(1);
+        var sphereHandle = MeshHandle.FromHashCode(2);
 
-        collection.AddPrimitive(box, Matrix4x4.Identity);
-        collection.AddPrimitive(sphere, Matrix4x4.Identity);
+        collection.AddInstance(boxHandle, materialHandle, Matrix4x4.Identity);
+        collection.AddInstance(sphereHandle, materialHandle, Matrix4x4.Identity);
 
         var batches = collection.GetBatches().ToList();
 
@@ -110,24 +119,20 @@ public class RenderBatchCollectionTests
     }
 
     [Fact]
-    public void AddPrimitive_GroupsByMeshAndMaterialCorrectly()
+    public void AddInstance_GroupsByMeshAndMaterialCorrectly()
     {
         var collection = new RenderBatchCollection();
 
         // Red boxes (same mesh, same material)
-        var redBox1 = new Box(new Vector3(1, 1, 1), new Flop.Core.Material(Flop.Core.Color.Red));
-        var redBox2 = new Box(new Vector3(1, 1, 1), new Flop.Core.Material(Flop.Core.Color.Red));
+        var box_handle = MeshHandle.FromHashCode(1);
+        var big_box_handle = MeshHandle.FromHashCode(2);
+        var red_material_handle = MaterialHandle.FromHashCode(1);
+        var blue_material_handle = MaterialHandle.FromHashCode(2);
 
-        // Blue boxes (same mesh, different material)
-        var blueBox1 = new Box(new Vector3(1, 1, 1), new Flop.Core.Material(Flop.Core.Color.Blue));
-
-        // Different size red box (different mesh, same material as red boxes)
-        var bigRedBox = new Box(new Vector3(2, 2, 2), new Flop.Core.Material(Flop.Core.Color.Red));
-
-        collection.AddPrimitive(redBox1, Matrix4x4.Identity);
-        collection.AddPrimitive(redBox2, Matrix4x4.Identity);
-        collection.AddPrimitive(blueBox1, Matrix4x4.Identity);
-        collection.AddPrimitive(bigRedBox, Matrix4x4.Identity);
+        collection.AddInstance(box_handle, red_material_handle, Matrix4x4.Identity);
+        collection.AddInstance(box_handle, red_material_handle, Matrix4x4.Identity);
+        collection.AddInstance(box_handle, blue_material_handle, Matrix4x4.Identity);
+        collection.AddInstance(big_box_handle, red_material_handle, Matrix4x4.Identity);
 
         // Should have 3 batches:
         // 1. Small red boxes (2 instances)

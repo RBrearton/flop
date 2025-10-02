@@ -20,16 +20,6 @@ public interface IGeometryRig
     Box BoundingBox { get; }
 
     /// <summary>
-    /// The position of this rig in world space.
-    /// </summary>
-    Vector3 Position { get; }
-
-    /// <summary>
-    /// The rotation of this rig in world space.
-    /// </summary>
-    Quaternion Rotation { get; }
-
-    /// <summary>
     /// Recursively flatten this rig to all constituent primitives.
     /// </summary>
     /// <returns>All primitives in all components of this rig.</returns>

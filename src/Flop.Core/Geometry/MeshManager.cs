@@ -1,3 +1,4 @@
+using Flop.Core.Geometry.Primitives;
 using Raylib_cs;
 
 namespace Flop.Core.Geometry;
@@ -18,25 +19,71 @@ public class MeshManager(IMeshUploader uploader, IMeshGenerator generator) : IDi
         : this(new RaylibMeshUploader(), new RaylibMeshGenerator()) { }
 
     /// <summary>
-    /// Get or create a mesh for the given primitive.
+    /// Upload a mesh for the given primitive to the GPU.
     /// If the mesh doesn't exist, it will be generated and uploaded to the GPU.
     /// Increments the reference count.
+    /// Returns the handle that can be used to retrieve the mesh.
     /// </summary>
-    public Mesh GetOrCreate(IGeometryPrimitive primitive)
+    public MeshHandle UploadMesh(IGeometryPrimitive primitive)
     {
-        MeshHandle handle = new(primitive);
+        var hash = ComputeHash(primitive);
+        MeshHandle handle = MeshHandle.FromHashCode(hash);
 
-        if (!_meshCache.TryGetValue(handle, out Mesh value))
+        if (!_meshCache.TryGetValue(handle, out Mesh _))
         {
             var mesh = primitive.GetMesh(_generator);
             _uploader.Upload(ref mesh);
-            value = mesh;
-            _meshCache[handle] = value;
+            _meshCache[handle] = mesh;
             _refCounts[handle] = 0;
         }
 
         _refCounts[handle]++;
-        return value;
+        return handle;
+    }
+
+    /// <summary>
+    /// Compute a deterministic hash for a primitive based on its geometry parameters.
+    /// Identical primitives will produce the same hash, enabling deduplication.
+    /// </summary>
+    public static int ComputeHash(IGeometryPrimitive primitive)
+    {
+        return primitive switch
+        {
+            Box box => HashCode.Combine(nameof(Box), box.Size.X, box.Size.Y, box.Size.Z),
+            Cylinder cylinder
+                => HashCode.Combine(
+                    nameof(Cylinder),
+                    cylinder.Radius,
+                    cylinder.Height,
+                    cylinder.Slices
+                ),
+            Sphere sphere
+                => HashCode.Combine(nameof(Sphere), sphere.Radius, sphere.Rings, sphere.Slices),
+            Hemisphere hemisphere
+                => HashCode.Combine(
+                    nameof(Hemisphere),
+                    hemisphere.Radius,
+                    hemisphere.Rings,
+                    hemisphere.Slices
+                ),
+            _ => throw new ArgumentException($"Unknown primitive type: {primitive.GetType().Name}"),
+        };
+    }
+
+    /// <summary>
+    /// Get the GPU mesh corresponding to the given handle.
+    /// Throws if the handle has not been uploaded.
+    /// </summary>
+    public Mesh GetMesh(MeshHandle handle)
+    {
+        if (!_meshCache.TryGetValue(handle, out Mesh mesh))
+        {
+            throw new InvalidOperationException(
+                $"Mesh handle {handle} has not been uploaded. Call UploadMesh first."
+            );
+        }
+
+        return mesh;
     }
 
     /// <summary>
@@ -75,7 +122,8 @@ public class MeshManager(IMeshUploader uploader, IMeshGenerator generator) : IDi
     /// </summary>
     public void Release(IGeometryPrimitive primitive)
     {
-        Release(new MeshHandle(primitive));
+        var hash = ComputeHash(primitive);
+        Release(MeshHandle.FromHashCode(hash));
     }
 
     /// <summary>
