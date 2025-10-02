@@ -21,22 +21,22 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     /// </summary>
     public void Render(IEnumerable<IGeometryRig> rigs, Camera3D camera)
     {
-        // Clear previous frame's batches
+        // Clear previous frame's batches.
         _batchCollection.Clear();
 
-        // Build batches from all rigs
+        // Build batches from all rigs.
         foreach (var rig in rigs)
         {
             BuildBatches(rig);
         }
 
-        // Begin 3D rendering
+        // Begin 3D rendering.
         Raylib.BeginMode3D(camera);
 
-        // Render all batches
+        // Render all batches.
         foreach (var batch in _batchCollection.GetBatches())
         {
-            // Get or create mesh and material from managers
+            // Get or create mesh and material from managers.
             var mesh = GetMeshFromHandle(batch.MeshHandle);
             var material = GetMaterialFromHandle(batch.MaterialHandle);
 
@@ -53,12 +53,12 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     /// </summary>
     private void BuildBatches(IGeometryRig rig)
     {
-        // Rig world transform
+        // Rig world transform.
         var rigWorldTransform = CreateTransformMatrix(rig.Position, rig.Rotation);
 
         foreach (var component in rig.Components)
         {
-            // Component local transform
+            // Component local transform.
             var componentLocalTransform = CreateTransformMatrix(
                 component.LocalPosition,
                 component.LocalRotation
@@ -66,13 +66,13 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
 
             foreach (var primitive in component.Primitives)
             {
-                // Primitive local transform
+                // Primitive local transform.
                 var primitiveLocalTransform = CreateTransformMatrix(
                     primitive.LocalPosition,
                     primitive.LocalRotation
                 );
 
-                // Compose final world transform: Rig * Component * Primitive
+                // Compose final world transform: Rig * Component * Primitive.
                 var worldTransform =
                     primitiveLocalTransform * componentLocalTransform * rigWorldTransform;
 
@@ -96,8 +96,10 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     /// </summary>
     private Mesh GetMeshFromHandle(MeshHandle handle)
     {
-        // This is a simplified approach - we need to find the primitive associated with this handle
-        // For now, this is a placeholder that will be addressed when we integrate with actual actors
+        // This is a simplified approach - we need to find the primitive associated with this
+        // handle.
+        // For now, this is a placeholder that will be addressed when we integrate with actual
+        // actors.
         throw new NotImplementedException(
             "GetMeshFromHandle requires primitive lookup. "
                 + "This will be implemented when integrating with actual actor system."
@@ -111,8 +113,9 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     /// </summary>
     private Material GetMaterialFromHandle(MaterialHandle handle)
     {
-        // This is a simplified approach - we need to find the material associated with this handle
-        // For now, this is a placeholder that will be addressed when we integrate with actual actors
+        // This is a simplified approach - we need to find the material associated with this handle.
+        // For now, this is a placeholder that will be addressed when we integrate with actual
+        // actors.
         throw new NotImplementedException(
             "GetMaterialFromHandle requires material lookup. "
                 + "This will be implemented when integrating with actual actor system."
