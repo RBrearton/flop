@@ -13,7 +13,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
 
         manager.GetOrCreate(cylinder);
 
@@ -26,7 +26,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
 
         manager.GetOrCreate(cylinder);
         manager.GetOrCreate(cylinder);
@@ -40,7 +40,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         manager.GetOrCreate(cylinder);
@@ -59,7 +59,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         manager.GetOrCreate(cylinder);
@@ -76,7 +76,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         manager.GetOrCreate(cylinder);
@@ -93,7 +93,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         var exception = Assert.Throws<InvalidOperationException>(() => manager.Release(handle));
@@ -106,7 +106,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         manager.GetOrCreate(cylinder);
@@ -122,7 +122,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         manager.GetOrCreate(cylinder);
@@ -138,7 +138,7 @@ public class MeshManagerTests
         var uploader = new MockMeshUploader();
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
-        var cylinder = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
         var handle = new MeshHandle(cylinder);
 
         Assert.False(manager.IsCached(handle));
@@ -156,13 +156,13 @@ public class MeshManagerTests
 
         Assert.Equal(0, manager.CachedMeshCount);
 
-        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, 16));
+        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16));
         Assert.Equal(1, manager.CachedMeshCount);
 
-        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, 16)); // Same - no increase
+        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16)); // Same - no increase
         Assert.Equal(1, manager.CachedMeshCount);
 
-        manager.GetOrCreate(new Sphere(0.5f, 16, 16)); // Different
+        manager.GetOrCreate(new Sphere(0.5f, new MaterialHandle("Test"), 16, 16)); // Different
         Assert.Equal(2, manager.CachedMeshCount);
     }
 
@@ -173,9 +173,9 @@ public class MeshManagerTests
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
 
-        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, 16));
-        manager.GetOrCreate(new Sphere(0.5f, 16, 16));
-        manager.GetOrCreate(new Box(new Vector3(1, 2, 3)));
+        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16));
+        manager.GetOrCreate(new Sphere(0.5f, new MaterialHandle("Test"), 16, 16));
+        manager.GetOrCreate(new Box(new Vector3(1, 2, 3), new MaterialHandle("Test")));
 
         manager.Dispose();
 
@@ -190,8 +190,8 @@ public class MeshManagerTests
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
 
-        var cylinder1 = new Cylinder(0.5f, 1.0f, 16);
-        var cylinder2 = new Cylinder(0.5f, 1.0f, 16);
+        var cylinder1 = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
+        var cylinder2 = new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16);
 
         var mesh1 = manager.GetOrCreate(cylinder1);
         var mesh2 = manager.GetOrCreate(cylinder2);
@@ -207,8 +207,8 @@ public class MeshManagerTests
         var generator = new MockMeshGenerator();
         var manager = new MeshManager(uploader, generator);
 
-        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, 16));
-        manager.GetOrCreate(new Cylinder(0.6f, 1.0f, 16)); // Different radius
+        manager.GetOrCreate(new Cylinder(0.5f, 1.0f, new MaterialHandle("Test"), 16));
+        manager.GetOrCreate(new Cylinder(0.6f, 1.0f, new MaterialHandle("Test"), 16)); // Different radius
 
         Assert.Equal(2, uploader.UploadCount);
         Assert.Equal(2, manager.CachedMeshCount);

@@ -1,14 +1,18 @@
 using System.Numerics;
+using Flop.Core.Geometry;
 using Flop.Core.Geometry.Primitives;
 
 namespace Flop.Core.Tests.Geometry;
 
 public class GeometryPrimitiveTests
 {
+    private static readonly MaterialHandle TestMaterial = new("Test");
+
+
     [Fact]
     public void Box_HasCorrectDimensions()
     {
-        var box = new Box(new Vector3(2, 4, 6));
+        var box = new Box(new Vector3(2, 4, 6), TestMaterial);
 
         Assert.Equal(2, box.SizeX);
         Assert.Equal(4, box.SizeY);
@@ -18,7 +22,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Box_CubeFactory_CreatesUniformBox()
     {
-        var cube = Box.Cube(5);
+        var cube = Box.Cube(5, TestMaterial);
 
         Assert.Equal(5, cube.SizeX);
         Assert.Equal(5, cube.SizeY);
@@ -28,7 +32,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Box_DefaultPosition_IsZero()
     {
-        var box = new Box(new Vector3(1, 1, 1));
+        var box = new Box(new Vector3(1, 1, 1), TestMaterial);
 
         Assert.Equal(Vector3.Zero, box.LocalPosition);
     }
@@ -36,7 +40,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Box_DefaultRotation_IsIdentity()
     {
-        var box = new Box(new Vector3(1, 1, 1));
+        var box = new Box(new Vector3(1, 1, 1), TestMaterial);
 
         Assert.Equal(Quaternion.Identity, box.LocalRotation);
     }
@@ -44,7 +48,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Cylinder_HasCorrectDiameter()
     {
-        var cylinder = new Cylinder(0.5f, 1.0f);
+        var cylinder = new Cylinder(0.5f, 1.0f, TestMaterial);
 
         Assert.Equal(1.0f, cylinder.Diameter);
     }
@@ -52,7 +56,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Sphere_HasCorrectDiameter()
     {
-        var sphere = new Sphere(0.5f);
+        var sphere = new Sphere(0.5f, TestMaterial);
 
         Assert.Equal(1.0f, sphere.Diameter);
     }
@@ -60,7 +64,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Hemisphere_HasCorrectDiameter()
     {
-        var hemisphere = new Hemisphere(0.5f);
+        var hemisphere = new Hemisphere(0.5f, TestMaterial);
 
         Assert.Equal(1.0f, hemisphere.Diameter);
     }
@@ -68,7 +72,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Box_BoundingBox_ReturnsSelf()
     {
-        var box = new Box(new Vector3(1, 2, 3));
+        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
 
         Assert.Equal(box, box.BoundingBox);
     }
@@ -76,7 +80,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Cylinder_BoundingBox_HasCorrectDimensions()
     {
-        var cylinder = new Cylinder(0.5f, 2.0f);
+        var cylinder = new Cylinder(0.5f, 2.0f, TestMaterial);
         var bbox = cylinder.BoundingBox;
 
         Assert.Equal(1.0f, bbox.SizeX); // Diameter
@@ -87,7 +91,7 @@ public class GeometryPrimitiveTests
     [Fact]
     public void Sphere_BoundingBox_IsUniform()
     {
-        var sphere = new Sphere(0.5f);
+        var sphere = new Sphere(0.5f, TestMaterial);
         var bbox = sphere.BoundingBox;
 
         Assert.Equal(1.0f, bbox.SizeX);

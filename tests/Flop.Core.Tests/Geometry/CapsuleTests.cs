@@ -1,3 +1,4 @@
+using Flop.Core.Geometry;
 using Flop.Core.Geometry.Components;
 using Flop.Core.Geometry.Primitives;
 
@@ -5,10 +6,12 @@ namespace Flop.Core.Tests.Geometry;
 
 public class CapsuleTests
 {
+    private static readonly MaterialHandle TestMaterial = new("Test");
+
     [Fact]
     public void Capsule_HasCorrectTotalHeight()
     {
-        var capsule = new Capsule(radius: 0.5f, height: 2.0f);
+        var capsule = new Capsule(radius: 0.5f, height: 2.0f, TestMaterial);
 
         // Total height = cylinder height + 2 * radius (caps)
         Assert.Equal(3.0f, capsule.TotalHeight);
@@ -17,7 +20,7 @@ public class CapsuleTests
     [Fact]
     public void Capsule_HasThreePrimitives()
     {
-        var capsule = new Capsule(0.5f, 2.0f);
+        var capsule = new Capsule(0.5f, 2.0f, TestMaterial);
 
         Assert.Equal(3, capsule.Primitives.Count);
     }
@@ -25,7 +28,7 @@ public class CapsuleTests
     [Fact]
     public void Capsule_FirstPrimitive_IsCylinder()
     {
-        var capsule = new Capsule(0.5f, 2.0f);
+        var capsule = new Capsule(0.5f, 2.0f, TestMaterial);
 
         Assert.IsType<Cylinder>(capsule.Primitives[0]);
     }
@@ -33,7 +36,7 @@ public class CapsuleTests
     [Fact]
     public void Capsule_HasTwoHemispheres()
     {
-        var capsule = new Capsule(0.5f, 2.0f);
+        var capsule = new Capsule(0.5f, 2.0f, TestMaterial);
 
         var hemisphereCount = capsule.Primitives.Count(p => p is Hemisphere);
         Assert.Equal(2, hemisphereCount);
@@ -42,7 +45,7 @@ public class CapsuleTests
     [Fact]
     public void Capsule_BoundingBox_UsesTotalHeight()
     {
-        var capsule = new Capsule(radius: 0.5f, height: 2.0f);
+        var capsule = new Capsule(radius: 0.5f, height: 2.0f, TestMaterial);
         var bbox = capsule.BoundingBox;
 
         Assert.Equal(1.0f, bbox.SizeX); // Diameter
@@ -53,7 +56,7 @@ public class CapsuleTests
     [Fact]
     public void Capsule_Hemispheres_HaveCorrectRadius()
     {
-        var capsule = new Capsule(radius: 0.5f, height: 2.0f);
+        var capsule = new Capsule(radius: 0.5f, height: 2.0f, TestMaterial);
 
         var hemispheres = capsule.Primitives.OfType<Hemisphere>().ToList();
 
@@ -63,7 +66,7 @@ public class CapsuleTests
     [Fact]
     public void Capsule_CylinderBody_HasCorrectDimensions()
     {
-        var capsule = new Capsule(radius: 0.5f, height: 2.0f, slices: 16);
+        var capsule = new Capsule(radius: 0.5f, height: 2.0f, TestMaterial, slices: 16);
         var cylinder = capsule.Primitives.OfType<Cylinder>().First();
 
         Assert.Equal(0.5f, cylinder.Radius);

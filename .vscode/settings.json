@@ -5,7 +5,11 @@
     "cSpell.words": [
         "bbox",
         "Imgui",
+        "lengthscale",
+        "Lerp",
+        "Perlin",
         "Raylib",
+        "Renderable",
         "Xunit"
     ]
 }
