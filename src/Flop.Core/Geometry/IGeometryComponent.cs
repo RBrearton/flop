@@ -1,5 +1,6 @@
 using System.Numerics;
 using Flop.Core.Geometry.Primitives;
+using Flop.Core.Geometry.Rigs;
 
 namespace Flop.Core.Geometry;
 
@@ -28,4 +29,10 @@ public interface IGeometryComponent
     /// The local rotation of this geometry component.
     /// </summary>
     Quaternion LocalRotation { get; }
+
+    /// <summary>
+    /// Creates a static rig consisting only of this component.
+    /// </summary>
+    /// <returns>A static rig consisting only of this component.</returns>
+    StaticRig AsStaticRig() => new(this);
 }
