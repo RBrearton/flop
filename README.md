@@ -25,6 +25,34 @@ dotnet build
 dotnet run --project src/Flop.Client
 ```
 
+## Core Architecture
+
+Instead of the typical entity-component or ECS frameworks, this repo make heavy use of inheritance.
+The key classes to think about are:
+
+- ***Entity***. This is the base class for everything in the game that gets rendered.
+- ***StaticEntity***. Child of entity; base class for everything that doesn't get rendered. E.g.:
+  - Rocks
+  - The terrain
+  - Spell effects
+  - Houses/buildings
+- ***Actor***. Child of entity; base class for everything that we can interact with.
+- ***EnvironmentActor***. Child of Actor; base class for stuff that can't interact with the world, e.g.:
+  - Trees
+  - Herbs
+  - Mining nodes
+  - Items on the floor
+- ***Character***. Child of Actor; base class for stuff that can interact with the world, e.g.:
+  - The player
+  - All NPCs
+  - All other player controlled characters
+
+There are many more classes in the hierarchy, but these are the most important ones to keep in mind.
+Beyond that, it's pretty obvious.
+For example, `TreeBase` subclasses `EnvironmentActor` and defines abstract methods that specific
+trees need to know how to override.
+Then, `WillowTree` and `BirchTree` are non-abstract children of `TreeBase`.
+
 ## Renderer Architecture
 
 Flop uses a modular, GPU-efficient rendering system built around instanced rendering. The architecture separates geometry definition (in Core) from GPU resource management and rendering (in Client).
