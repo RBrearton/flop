@@ -1,36 +1,30 @@
+using System.Numerics;
+using Flop.Core.Geometry;
 using Flop.Core.Noise;
+using Flop.Core.StaticEntities.Terrain;
 
-namespace Flop.Core.StaticEntities.Terrain;
+namespace Flop.Core.StaticEntities;
 
 /// <summary>
 /// Represents a single chunk of procedurally generated terrain.
 /// </summary>
-public readonly record struct TerrainChunk
+public class TerrainChunk(
+    TerrainIndex index,
+    TerrainChunkType chunkType,
+    Biome biome,
+    TerrainConfig config
+)
+    : StaticEntity(
+        Identity.New("TerrainChunk", index.ToString()),
+        index.ToPosition(config.ChunkSize),
+        Quaternion.Identity
+    )
 {
-    /// <summary>
-    /// The 2D index of this chunk in the terrain grid.
-    /// </summary>
-    public TerrainIndex Index { get; init; }
+    public TerrainIndex Index { get; } = index;
+    public TerrainChunkType ChunkType { get; } = chunkType;
+    public Biome Biome { get; } = biome;
 
-    /// <summary>
-    /// The type of terrain in this chunk e.g. (grass, sand, water).
-    /// </summary>
-    public TerrainChunkType ChunkType { get; init; }
-
-    /// <summary>
-    /// The biome this chunk belongs to e.g. (meadow, snow, etc).
-    /// </summary>
-    public Biome Biome { get; init; }
-
-    /// <summary>
-    /// Create a new terrain chunk with the given properties.
-    /// </summary>
-    public TerrainChunk(TerrainIndex index, TerrainChunkType chunkType, Biome biome)
-    {
-        Index = index;
-        ChunkType = chunkType;
-        Biome = biome;
-    }
+    public override IGeometryRig GeometryRig => throw new NotImplementedException();
 
     /// <summary>
     /// Procedurally generate a terrain chunk at the given index.
@@ -51,6 +45,6 @@ public readonly record struct TerrainChunk
         TerrainChunkType chunkType = config.GetChunkType(chunkNoise);
         Biome biome = config.GetBiome(biomeNoise);
 
-        return new TerrainChunk(index, chunkType, biome);
+        return new TerrainChunk(index, chunkType, biome, config);
     }
 }
