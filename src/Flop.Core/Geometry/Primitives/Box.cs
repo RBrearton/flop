@@ -1,4 +1,6 @@
 using System.Numerics;
+using Flop.Core.Geometry.Components;
+using Flop.Core.Geometry.Rigs;
 using Raylib_cs;
 
 namespace Flop.Core.Geometry.Primitives;
@@ -11,7 +13,7 @@ public readonly record struct Box : IGeometryPrimitive
     /// <summary>
     /// The dimensions of the box along each axis.
     /// </summary>
-    public Vector3 Size { get; init; }
+    public Vector3 Size { get; }
 
     public Vector3 LocalPosition { get; init; }
     public Quaternion LocalRotation { get; init; }
@@ -88,6 +90,10 @@ public readonly record struct Box : IGeometryPrimitive
 
     #region IGeometryPrimitive
     public Mesh GetMesh(IMeshGenerator generator) => generator.GenMeshCube(SizeX, SizeY, SizeZ);
+
+    public SimpleComponent AsSimpleComponent() => new(this);
+
+    public StaticRig AsStaticRig() => new(AsSimpleComponent());
 
     public Box BoundingBox => this;
     #endregion

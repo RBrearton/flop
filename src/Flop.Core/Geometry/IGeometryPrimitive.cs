@@ -1,5 +1,7 @@
 using System.Numerics;
+using Flop.Core.Geometry.Components;
 using Flop.Core.Geometry.Primitives;
+using Flop.Core.Geometry.Rigs;
 using Raylib_cs;
 
 namespace Flop.Core.Geometry;
@@ -43,4 +45,18 @@ public interface IGeometryPrimitive
     /// Contains rendering properties like color (and eventually textures, shaders, etc.).
     /// </summary>
     Material Material { get; }
+
+    /// <summary>
+    /// Creates a simple component consisting of only this primitive.
+    /// </summary>
+    /// <returns>A simple component consisting of only this primitive.</returns>
+    SimpleComponent AsSimpleComponent() => new(this);
+
+    /// <summary>
+    /// Creates a simple static rig consisting of only a simple component, which in turn
+    /// consists of only this primitive.
+    /// </summary>
+    /// <returns>A simple static rig consisting of only a simple component, which in turn
+    /// consists of only this primitive.</returns>
+    StaticRig AsStaticRig() => new(AsSimpleComponent());
 }
