@@ -15,9 +15,9 @@ public interface IGeometryRig
     IReadOnlyList<IGeometryComponent> Components { get; }
 
     /// <summary>
-    /// Return the bounding box for this entire rig.
+    /// Return the axis-aligned bounding box for this entire rig.
     /// </summary>
-    Box BoundingBox { get; }
+    AxisAlignedBoundingBox BoundingBox { get; }
 
     /// <summary>
     /// Recursively flatten this rig to all constituent primitives.

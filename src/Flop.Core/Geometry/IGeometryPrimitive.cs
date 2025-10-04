@@ -1,6 +1,5 @@
 using System.Numerics;
 using Flop.Core.Geometry.Components;
-using Flop.Core.Geometry.Primitives;
 using Flop.Core.Geometry.Rigs;
 using Raylib_cs;
 
@@ -21,22 +20,22 @@ public interface IGeometryPrimitive
     Mesh GetMesh(IMeshGenerator generator);
 
     /// <summary>
-    /// Return the bounding box for this geometry module.
+    /// Return the axis-aligned bounding box for this geometry primitive.
     /// </summary>
-    Box BoundingBox { get; }
+    AxisAlignedBoundingBox BoundingBox { get; }
 
     /// <summary>
-    /// Return the center point for this geometry module.
+    /// Return the center point for this geometry primitive.
     /// </summary>
-    Vector3 Center => BoundingBox.Size / 2;
+    Vector3 Center => BoundingBox.Center;
 
     /// <summary>
-    /// The local position of this geometry module.
+    /// The local position of this geometry primitive.
     /// </summary>
     Vector3 LocalPosition { get; }
 
     /// <summary>
-    /// The local rotation of this geometry module.
+    /// The local rotation of this geometry primitive.
     /// </summary>
     Quaternion LocalRotation { get; }
 

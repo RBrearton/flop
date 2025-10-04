@@ -16,9 +16,9 @@ public interface IGeometryComponent
     IReadOnlyList<IGeometryPrimitive> Primitives { get; }
 
     /// <summary>
-    /// Return the bounding box for this geometry component.
+    /// Return the axis-aligned bounding box for this geometry component.
     /// </summary>
-    Box BoundingBox { get; }
+    AxisAlignedBoundingBox BoundingBox { get; }
 
     /// <summary>
     /// The local position of this geometry component.

@@ -3,6 +3,7 @@
         100
     ],
     "cSpell.words": [
+        "AABB",
         "bbox",
         "Imgui",
         "lengthscale",
@@ -11,6 +12,7 @@
         "Raylib",
         "Renderable",
         "renderables",
+        "Unrotated",
         "Xunit"
     ]
 }
