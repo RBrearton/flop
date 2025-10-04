@@ -1,6 +1,6 @@
 using Flop.Core.Geometry.Primitives;
 
-namespace Flop.Core.Geometry;
+namespace Flop.Core.Geometry.Rigs;
 
 /// <summary>
 /// A static rig is the simplest kind of geometry rig - it just contains a single geometry
