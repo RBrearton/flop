@@ -1,6 +1,6 @@
 using Flop.Core.Noise;
 
-namespace Flop.Core.Terrain;
+namespace Flop.Core.StaticEntities.Terrain;
 
 /// <summary>
 /// Represents a single chunk of procedurally generated terrain.

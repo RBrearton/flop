@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Flop.Core.Terrain;
+namespace Flop.Core.StaticEntities.Terrain;
 
 /// <summary>
 /// A 2D index that uniquely specifies a chunk of terrain.

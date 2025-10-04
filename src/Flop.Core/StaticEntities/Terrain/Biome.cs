@@ -1,4 +1,4 @@
-namespace Flop.Core.Terrain;
+namespace Flop.Core.StaticEntities.Terrain;
 
 /// <summary>
 /// The biome of a terrain chunk.
