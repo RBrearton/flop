@@ -1,6 +1,3 @@
-using System.Numerics;
-using Flop.Core.Geometry.Primitives;
-
 namespace Flop.Core.Geometry;
 
 /// <summary>

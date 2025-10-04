@@ -1,5 +1,4 @@
 using System.Numerics;
-using Flop.Core.Geometry.Primitives;
 using Flop.Core.Geometry.Rigs;
 
 namespace Flop.Core.Geometry;
