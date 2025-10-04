@@ -108,7 +108,23 @@ public readonly record struct Capsule : IGeometryComponent
         }
     }
 
-    public Box BoundingBox =>
-        new(new Vector3(Diameter, TotalHeight, Diameter), Material, LocalPosition, LocalRotation);
+    public AxisAlignedBoundingBox BoundingBox
+    {
+        get
+        {
+            // Capsule is cylinder + 2 hemispheres, aligned with Y-axis by default.
+            if (LocalRotation == Quaternion.Identity)
+            {
+                var halfTotalHeight = TotalHeight / 2f;
+                return new AxisAlignedBoundingBox(
+                    LocalPosition + new Vector3(-Radius, -halfTotalHeight, -Radius),
+                    LocalPosition + new Vector3(Radius, halfTotalHeight, Radius)
+                );
+            }
+
+            // If rotated, union the bounding boxes of constituent primitives.
+            return Primitives.Select(p => p.BoundingBox).Aggregate(AxisAlignedBoundingBox.Union);
+        }
+    }
     #endregion
 }
