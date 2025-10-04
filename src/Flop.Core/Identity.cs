@@ -15,4 +15,13 @@ public readonly record struct Identity(string DisplayName, UniqueId UniqueId)
     /// The unique identifier of this identity.
     /// </summary>
     public UniqueId UniqueId { get; init; } = UniqueId;
+
+    /// <summary>
+    /// Create a new identity with a new UniqueId given the UniqueId's prefix and a display name.
+    /// </summary>
+    /// <param name="uniqueIdPrefix">The prefix for the unique ID.</param>
+    /// <param name="displayName">The display name for the identity.</param>
+    /// <returns>The new identity.</returns>
+    public static Identity New(string uniqueIdPrefix, string displayName) =>
+        new(displayName, UniqueId.New(uniqueIdPrefix));
 }
