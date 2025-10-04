@@ -13,15 +13,15 @@ public interface IIdentifiable
     /// <summary>
     /// The unique identifier associated with this object.
     /// </summary>
-    UniqueId UniqueId { get; }
+    UniqueId UniqueId => Identity.UniqueId;
 
     /// <summary>
     /// The unique ID string associated with this object.
     /// </summary>
-    string UniqueIdString { get; }
+    string UniqueIdString => Identity.UniqueId.ToString();
 
     /// <summary>
     /// This object's display name.
     /// </summary>
-    string DisplayName { get; }
+    string DisplayName => Identity.DisplayName;
 }
