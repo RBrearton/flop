@@ -1,5 +1,5 @@
 using System.Numerics;
-using Flop.Core.Geometry.Primitives;
+using Flop.Core.Geometry;
 
 namespace Flop.Core.Spatial;
 
@@ -16,7 +16,7 @@ public interface ISpatialQueryEngine<T>
     /// </summary>
     /// <param name="boundingBox">The bounding box to query.</param>
     /// <returns>The actors that are inside the bounding box.</returns>
-    IEnumerable<T> GetInside(Box boundingBox);
+    IEnumerable<T> GetInside(AxisAlignedBoundingBox boundingBox);
 
     /// <summary>
     /// Get all actors that are within the given range from the given position.
