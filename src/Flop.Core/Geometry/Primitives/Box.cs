@@ -35,6 +35,47 @@ public readonly record struct Box : IGeometryPrimitive
     public float SizeZ => Size.Z;
 
     /// <summary>
+    /// Get the 8 corner vertices in local space (centered at origin, before rotation/translation).
+    /// </summary>
+    private Vector3[] GetLocalCorners()
+    {
+        var halfSize = Size / 2f;
+        return
+        [
+            new(-halfSize.X, -halfSize.Y, -halfSize.Z),
+            new(-halfSize.X, -halfSize.Y, halfSize.Z),
+            new(-halfSize.X, halfSize.Y, -halfSize.Z),
+            new(-halfSize.X, halfSize.Y, halfSize.Z),
+            new(halfSize.X, -halfSize.Y, -halfSize.Z),
+            new(halfSize.X, -halfSize.Y, halfSize.Z),
+            new(halfSize.X, halfSize.Y, -halfSize.Z),
+            new(halfSize.X, halfSize.Y, halfSize.Z),
+        ];
+    }
+
+    /// <summary>
+    /// Get all vertices in world space (after rotation and translation).
+    /// Rotation is applied around origin, then translation is applied.
+    /// </summary>
+    public Vector3[] VertexCoordinates
+    {
+        get
+        {
+            var corners = GetLocalCorners();
+            var rotation = LocalRotation;
+            var position = LocalPosition;
+
+            // Rotate around origin, then translate
+            return [.. corners.Select(c => Vector3.Transform(c, rotation) + position)];
+        }
+    }
+
+    /// <summary>
+    /// The geometric center of this box.
+    /// </summary>
+    public Vector3 Center => LocalPosition;
+
+    /// <summary>
     /// Create a box with the specified dimensions.
     /// </summary>
     /// <param name="size">The size of the box along each axis.</param>
@@ -95,6 +136,28 @@ public readonly record struct Box : IGeometryPrimitive
 
     public StaticRig AsStaticRig() => new(AsSimpleComponent());
 
-    public Box BoundingBox => this;
+    /// <summary>
+    /// The axis-aligned bounding box for this box primitive.
+    /// If rotated, the AABB will be larger than the box itself.
+    /// </summary>
+    public AxisAlignedBoundingBox BoundingBox
+    {
+        get
+        {
+            // If no rotation, AABB is exact.
+            if (LocalRotation == Quaternion.Identity)
+            {
+                var halfSize = Size / 2f;
+                return new AxisAlignedBoundingBox(
+                    LocalPosition - halfSize,
+                    LocalPosition + halfSize
+                );
+            }
+
+            // If rotated, compute AABB from transformed corners.
+            var vertices = VertexCoordinates;
+            return AxisAlignedBoundingBox.FromPoints(vertices);
+        }
+    }
     #endregion
 }
