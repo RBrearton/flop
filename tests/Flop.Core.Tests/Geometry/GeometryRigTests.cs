@@ -50,11 +50,12 @@ public class GeometryRigTests
         var box = new Box(1, 2, 3, TestMaterial);
 
         IGeometryRig rig = new TestRig(
-        [
-            new SinglePrimitiveComponent(cylinder),
-            new SinglePrimitiveComponent(sphere),
-            new SinglePrimitiveComponent(box),
-        ]);
+            [
+                new SinglePrimitiveComponent(cylinder),
+                new SinglePrimitiveComponent(sphere),
+                new SinglePrimitiveComponent(box),
+            ]
+        );
 
         var primitives = rig.AllPrimitives().ToList();
 
@@ -68,16 +69,16 @@ public class GeometryRigTests
     private class TestRig(IReadOnlyList<IGeometryComponent> components) : IGeometryRig
     {
         public IReadOnlyList<IGeometryComponent> Components => components;
-        public Box BoundingBox => Box.Cube(1, TestMaterial);
-        public Vector3 Position => Vector3.Zero;
-        public Quaternion Rotation => Quaternion.Identity;
+        public AxisAlignedBoundingBox BoundingBox => Box.Cube(1, TestMaterial).BoundingBox;
+        public static Vector3 Position => Vector3.Zero;
+        public static Quaternion Rotation => Quaternion.Identity;
     }
 
     // Wrapper to make a primitive act as a component
     private class SinglePrimitiveComponent(IGeometryPrimitive primitive) : IGeometryComponent
     {
         public IReadOnlyList<IGeometryPrimitive> Primitives => [primitive];
-        public Box BoundingBox => primitive.BoundingBox;
+        public AxisAlignedBoundingBox BoundingBox => primitive.BoundingBox;
         public Vector3 LocalPosition => primitive.LocalPosition;
         public Quaternion LocalRotation => primitive.LocalRotation;
     }

@@ -48,9 +48,9 @@ public class CapsuleTests
         var capsule = new Capsule(radius: 0.5f, height: 2.0f, TestMaterial);
         var bbox = capsule.BoundingBox;
 
-        Assert.Equal(1.0f, bbox.SizeX); // Diameter
-        Assert.Equal(3.0f, bbox.SizeY); // TotalHeight
-        Assert.Equal(1.0f, bbox.SizeZ); // Diameter
+        Assert.Equal(1.0f, bbox.Size.X, precision: 2); // Diameter
+        Assert.Equal(3.0f, bbox.Size.Y, precision: 2); // TotalHeight
+        Assert.Equal(1.0f, bbox.Size.Z, precision: 2); // Diameter
     }
 
     [Fact]

@@ -8,7 +8,6 @@ public class GeometryPrimitiveTests
 {
     private static readonly Material TestMaterial = Material.Default;
 
-
     [Fact]
     public void Box_HasCorrectDimensions()
     {
@@ -70,11 +69,13 @@ public class GeometryPrimitiveTests
     }
 
     [Fact]
-    public void Box_BoundingBox_ReturnsSelf()
+    public void Box_BoundingBox_HasCorrectCenterAndSize()
     {
-        var box = new Box(new Vector3(1, 2, 3), TestMaterial);
+        var box = new Box(new Vector3(1, 2, 3), TestMaterial, new Vector3(5, 5, 5));
+        var bbox = box.BoundingBox;
 
-        Assert.Equal(box, box.BoundingBox);
+        Assert.Equal(new Vector3(5, 5, 5), bbox.Center);
+        Assert.Equal(new Vector3(1, 2, 3), bbox.Size);
     }
 
     [Fact]
@@ -83,9 +84,9 @@ public class GeometryPrimitiveTests
         var cylinder = new Cylinder(0.5f, 2.0f, TestMaterial);
         var bbox = cylinder.BoundingBox;
 
-        Assert.Equal(1.0f, bbox.SizeX); // Diameter
-        Assert.Equal(2.0f, bbox.SizeY); // Height
-        Assert.Equal(1.0f, bbox.SizeZ); // Diameter
+        Assert.Equal(1.0f, bbox.Size.X, precision: 2); // Diameter
+        Assert.Equal(2.0f, bbox.Size.Y, precision: 2); // Height
+        Assert.Equal(1.0f, bbox.Size.Z, precision: 2); // Diameter
     }
 
     [Fact]
@@ -94,8 +95,55 @@ public class GeometryPrimitiveTests
         var sphere = new Sphere(0.5f, TestMaterial);
         var bbox = sphere.BoundingBox;
 
-        Assert.Equal(1.0f, bbox.SizeX);
-        Assert.Equal(1.0f, bbox.SizeY);
-        Assert.Equal(1.0f, bbox.SizeZ);
+        Assert.Equal(1.0f, bbox.Size.X, precision: 2);
+        Assert.Equal(1.0f, bbox.Size.Y, precision: 2);
+        Assert.Equal(1.0f, bbox.Size.Z, precision: 2);
+    }
+
+    [Fact]
+    public void Box_BoundingBox_ExpandsWhenRotated()
+    {
+        // Create a box rotated 45 degrees around Y-axis
+        var rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 4f);
+        var box = new Box(2, 1, 1, TestMaterial, Vector3.Zero, rotation);
+        var bbox = box.BoundingBox;
+
+        // AABB should be larger than original box in X and Z
+        Assert.True(bbox.Size.X > 2.0f);
+        Assert.True(bbox.Size.Z > 1.0f);
+        Assert.Equal(1.0f, bbox.Size.Y, precision: 3); // Y unchanged
+    }
+
+    [Fact]
+    public void Cylinder_BoundingBox_ExpandsWhenRotatedToHorizontal()
+    {
+        // Rotate cylinder 90 degrees to lie on X-axis
+        var rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathF.PI / 2f);
+        var cylinder = new Cylinder(0.5f, 2.0f, TestMaterial, localRotation: rotation);
+        var bbox = cylinder.BoundingBox;
+
+        // Height (2) should now be along X-axis
+        Assert.Equal(2.0f, bbox.Size.X, precision: 2);
+        Assert.Equal(1.0f, bbox.Size.Y, precision: 2); // Diameter
+        Assert.Equal(1.0f, bbox.Size.Z, precision: 2); // Diameter
+    }
+
+    [Fact]
+    public void Box_Center_EqualsLocalPosition()
+    {
+        var position = new Vector3(3, 4, 5);
+        var box = new Box(1, 2, 3, TestMaterial, position);
+
+        Assert.Equal(position, box.Center);
+    }
+
+    [Fact]
+    public void Sphere_RotationDoesNotAffectBoundingBox()
+    {
+        var rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathF.PI / 3f);
+        var sphere1 = new Sphere(1.0f, TestMaterial);
+        var sphere2 = new Sphere(1.0f, TestMaterial, localRotation: rotation);
+
+        Assert.Equal(sphere1.BoundingBox.Size, sphere2.BoundingBox.Size);
     }
 }
