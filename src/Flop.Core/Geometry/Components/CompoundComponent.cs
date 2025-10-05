@@ -26,6 +26,10 @@ public class CompoundComponent(
                     "Cannot create AABB for empty compound component"
                 );
             }
+            if (primitives.Count == 1)
+            {
+                return primitives[0].BoundingBox;
+            }
 
             // Union all primitive AABBs in component-local space.
             var localAABB = primitives
