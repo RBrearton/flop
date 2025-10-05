@@ -112,18 +112,18 @@ public readonly record struct Capsule : IGeometryComponent
     {
         get
         {
-            // Capsule is cylinder + 2 hemispheres, aligned with Y-axis by default.
-            if (LocalRotation == Quaternion.Identity)
-            {
-                var halfTotalHeight = TotalHeight / 2f;
-                return new AxisAlignedBoundingBox(
-                    LocalPosition + new Vector3(-Radius, -halfTotalHeight, -Radius),
-                    LocalPosition + new Vector3(Radius, halfTotalHeight, Radius)
-                );
-            }
+            // Create an oriented bounding box (OBB) that exactly encompasses the capsule.
+            var orientedBoundingBox = new Box(
+                Diameter,
+                TotalHeight,
+                Diameter,
+                Material,
+                LocalPosition,
+                LocalRotation
+            );
 
-            // If rotated, union the bounding boxes of constituent primitives.
-            return Primitives.Select(p => p.BoundingBox).Aggregate(AxisAlignedBoundingBox.Union);
+            // Get the AABB of the OBB.
+            return orientedBoundingBox.BoundingBox;
         }
     }
     #endregion
