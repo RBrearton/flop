@@ -9,8 +9,8 @@ namespace Flop.Core.Geometry.Components;
 /// </summary>
 public class CompoundComponent(
     IReadOnlyList<IGeometryPrimitive> primitives,
-    Vector3 localPosition,
-    Quaternion localRotation
+    Vector3 localPosition = default,
+    Quaternion localRotation = default
 ) : IGeometryComponent
 {
     public IReadOnlyList<IGeometryPrimitive> Primitives => primitives;
@@ -61,6 +61,7 @@ public class CompoundComponent(
         }
     }
 
-    public Vector3 LocalPosition => localPosition;
-    public Quaternion LocalRotation => localRotation;
+    public Vector3 LocalPosition => localPosition == default ? Vector3.Zero : localPosition;
+    public Quaternion LocalRotation =>
+        localRotation == default ? Quaternion.Identity : localRotation;
 }
