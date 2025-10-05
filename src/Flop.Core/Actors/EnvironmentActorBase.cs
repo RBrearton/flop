@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Flop.Core.Actors;
 
 /// <summary>
@@ -10,4 +12,5 @@ namespace Flop.Core.Actors;
 /// They're things in the world that the player can interact with, but they're unable to interact
 /// with anything themselves.
 /// </summary>
-public abstract class EnvironmentActorBase : Actor { }
+public abstract class EnvironmentActorBase(Identity identity, Vector3 position, Quaternion rotation)
+    : Actor(identity, position, rotation) { }
