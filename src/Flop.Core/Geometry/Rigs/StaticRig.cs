@@ -1,5 +1,3 @@
-using Flop.Core.Geometry.Primitives;
-
 namespace Flop.Core.Geometry.Rigs;
 
 /// <summary>
@@ -9,5 +7,5 @@ namespace Flop.Core.Geometry.Rigs;
 public class StaticRig(IGeometryComponent component) : IGeometryRig
 {
     public IReadOnlyList<IGeometryComponent> Components { get; } = [component];
-    public Box BoundingBox { get; } = component.BoundingBox;
+    public AxisAlignedBoundingBox BoundingBox { get; } = component.BoundingBox;
 }
