@@ -228,7 +228,7 @@ public class SpatialHashGrid<T>
         int z = cell.z;
 
         // Sure, I could write an algorithm that works for ND, and I could write an
-        // N-dimensional cell structure, but... who cares. For a standard video game we only
+        // N-dimensional spatial hash grid, but... who cares. For a standard video game we only
         // ever need 2D lookups.
         return
         [
