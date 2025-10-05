@@ -20,7 +20,7 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     /// Render all renderables using the given camera.
     /// Builds batches, acquires meshes/materials, and renders via DrawMeshInstanced.
     /// </summary>
-    public void Render(IEnumerable<Flop.Core.IRenderable> renderables, Camera3D camera)
+    public void Render(IEnumerable<IRenderable> renderables, Camera3D camera)
     {
         // Clear previous frame's batches.
         _batchCollection.Clear();
@@ -52,15 +52,12 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     /// Build render batches from a renderable.
     /// Calculates world transforms for all primitives and adds them to batches.
     /// </summary>
-    private void BuildBatches(Flop.Core.IRenderable renderable)
+    private void BuildBatches(IRenderable renderable)
     {
         // Renderable world transform.
-        var rigWorldTransform = CreateTransformMatrix(
-            ((IHasPlacement)renderable).Position,
-            ((IHasPlacement)renderable).Rotation
-        );
+        var rigWorldTransform = CreateTransformMatrix(renderable.Position, renderable.Rotation);
 
-        foreach (var component in renderable.Components)
+        foreach (var component in renderable.GeometryRig.Components)
         {
             // Component local transform.
             var componentLocalTransform = CreateTransformMatrix(
@@ -98,7 +95,6 @@ public class Renderer(MeshManager meshManager, MaterialManager materialManager) 
     {
         return Matrix4x4.CreateFromQuaternion(rotation) * Matrix4x4.CreateTranslation(position);
     }
-
 
     /// <summary>
     /// Clear all cached meshes and materials.
