@@ -1,4 +1,5 @@
 using System.Numerics;
+using Flop.Core.Geometry.Rigs;
 
 namespace Flop.Core.Geometry.Components;
 
@@ -64,4 +65,6 @@ public class CompoundComponent(
     public Vector3 LocalPosition => localPosition == default ? Vector3.Zero : localPosition;
     public Quaternion LocalRotation =>
         localRotation == default ? Quaternion.Identity : localRotation;
+
+    public StaticRig AsStaticRig() => new(this);
 }
