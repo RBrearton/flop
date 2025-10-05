@@ -1,5 +1,4 @@
 using System.Numerics;
-using Flop.Core.Geometry.Primitives;
 
 namespace Flop.Core.Geometry.Components;
 
@@ -9,7 +8,7 @@ namespace Flop.Core.Geometry.Components;
 public class SimpleComponent(IGeometryPrimitive primitive) : IGeometryComponent
 {
     public IReadOnlyList<IGeometryPrimitive> Primitives => [primitive];
-    public Box BoundingBox => primitive.BoundingBox;
+    public AxisAlignedBoundingBox BoundingBox => primitive.BoundingBox;
     public Vector3 LocalPosition => primitive.LocalPosition;
     public Quaternion LocalRotation => primitive.LocalRotation;
 }

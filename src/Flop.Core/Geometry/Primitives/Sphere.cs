@@ -63,7 +63,17 @@ public readonly record struct Sphere : IGeometryPrimitive
     #region IGeometryPrimitive
     public Mesh GetMesh(IMeshGenerator generator) => generator.GenMeshSphere(Radius, Rings, Slices);
 
-    public Box BoundingBox =>
-        new(new Vector3(Diameter, Diameter, Diameter), Material, LocalPosition, LocalRotation);
+    /// <summary>
+    /// The axis-aligned bounding box for this sphere.
+    /// Sphere AABB is always the same regardless of rotation.
+    /// </summary>
+    public AxisAlignedBoundingBox BoundingBox
+    {
+        get
+        {
+            var radiusVec = new Vector3(Radius, Radius, Radius);
+            return new AxisAlignedBoundingBox(LocalPosition - radiusVec, LocalPosition + radiusVec);
+        }
+    }
     #endregion
 }
