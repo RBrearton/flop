@@ -65,7 +65,28 @@ public readonly record struct Hemisphere : IGeometryPrimitive
     public Mesh GetMesh(IMeshGenerator generator) =>
         generator.GenMeshHemiSphere(Radius, Rings, Slices);
 
-    public Box BoundingBox =>
-        new(new Vector3(Diameter, Radius, Diameter), Material, LocalPosition, LocalRotation);
+    /// <summary>
+    /// The axis-aligned bounding box for this hemisphere.
+    /// Creates a rotated box that snugly fits the hemisphere, then returns its AABB.
+    /// </summary>
+    public AxisAlignedBoundingBox BoundingBox
+    {
+        get
+        {
+            // Create an oriented bounding box (OBB) that exactly encompasses the hemisphere.
+            // Y = Radius (height of dome), X and Z = Diameter (width of base).
+            var orientedBoundingBox = new Box(
+                Diameter,
+                Radius,
+                Diameter,
+                Material,
+                LocalPosition,
+                LocalRotation
+            );
+
+            // Get the AABB of the OBB.
+            return orientedBoundingBox.BoundingBox;
+        }
+    }
     #endregion
 }

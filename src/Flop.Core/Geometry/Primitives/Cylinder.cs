@@ -63,7 +63,27 @@ public readonly record struct Cylinder : IGeometryPrimitive
     public Mesh GetMesh(IMeshGenerator generator) =>
         generator.GenMeshCylinder(Radius, Height, Slices);
 
-    public Box BoundingBox =>
-        new(new Vector3(Diameter, Height, Diameter), Material, LocalPosition, LocalRotation);
+    /// <summary>
+    /// The axis-aligned bounding box for this cylinder.
+    /// Creates a rotated box that snugly fits the cylinder, then returns its AABB.
+    /// </summary>
+    public AxisAlignedBoundingBox BoundingBox
+    {
+        get
+        {
+            // Create an oriented bounding box (OBB) that exactly encompasses the cylinder.
+            var orientedBoundingBox = new Box(
+                Diameter,
+                Height,
+                Diameter,
+                Material,
+                LocalPosition,
+                LocalRotation
+            );
+
+            // Get the AABB of the OBB.
+            return orientedBoundingBox.BoundingBox;
+        }
+    }
     #endregion
 }
