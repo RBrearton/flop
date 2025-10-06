@@ -1,3 +1,6 @@
+using System.Numerics;
+using Flop.Core.Geometry;
+
 namespace Flop.Core.Spatial;
 
 /// <summary>
@@ -19,7 +22,7 @@ namespace Flop.Core.Spatial;
 /// containing that position, as well as all adjacent cells.
 /// </summary>
 /// <typeparam name="T">The type of actor to store in the SpatialHashGrid.</typeparam>
-public class SpatialHashGrid<T>
+public class SpatialHashGrid<T> : ISpatialQueryEngine<T>
     where T : Actor
 {
     // The side length of each cell in our SpatialHashGrid.
@@ -63,24 +66,52 @@ public class SpatialHashGrid<T>
     {
         // Find the actor's cell using the _actorNameToCell lookup table, while removing our
         // actor's entry from the _actorNameToCell dictionary.
-        _actorNameToCell.Remove(actor.Identity, out var actorCell);
+        if (!_actorNameToCell.Remove(actor.Identity, out var actorCell))
+            return; // Actor not in grid
 
-        // Remove the actor's entry from the _cellToActors dictionary.
-        _cellToActors.Remove(actorCell);
+        // Remove the actor from the cell's actor list
+        if (_cellToActors.TryGetValue(actorCell, out var actorList))
+        {
+            actorList.Remove(actor);
+
+            // If the cell is now empty, remove it entirely
+            if (actorList.Count == 0)
+            {
+                _cellToActors.Remove(actorCell);
+            }
+        }
     }
 
     /// <summary>
-    /// Removes an actor from the SpatialHashGrid, given the actor's name.
+    /// Removes an actor from the SpatialHashGrid, given the actor's identity.
     /// </summary>
-    /// <param name="actorName">The name of the actor that we want to remove.</param>
+    /// <param name="actorIdentity">The identity of the actor that we want to remove.</param>
     public void RemoveActor(Identity actorIdentity)
     {
         // Find the actor's cell using the _actorNameToCell lookup table, while removing our
         // actor's entry from the _actorNameToCell dictionary.
-        _actorNameToCell.Remove(actorIdentity, out var actorCell);
+        if (!_actorNameToCell.Remove(actorIdentity, out var actorCell))
+            return; // Actor not in grid
 
-        // Remove the actor's entry from the _cellToActors dictionary.
-        _cellToActors.Remove(actorCell);
+        // Remove the actor from the cell's actor list
+        if (_cellToActors.TryGetValue(actorCell, out var actorList))
+        {
+            // Find and remove the actor by identity
+            for (int i = actorList.Count - 1; i >= 0; i--)
+            {
+                if (actorList[i].Identity == actorIdentity)
+                {
+                    actorList.RemoveAt(i);
+                    break;
+                }
+            }
+
+            // If the cell is now empty, remove it entirely
+            if (actorList.Count == 0)
+            {
+                _cellToActors.Remove(actorCell);
+            }
+        }
     }
 
     /// <summary>
@@ -242,5 +273,148 @@ public class SpatialHashGrid<T>
             (x, z - 1),
             (x - 1, z - 1),
         ];
+    }
+
+    // ISpatialQueryEngine implementation
+
+    public IEnumerable<T> GetInside(AxisAlignedBoundingBox boundingBox)
+    {
+        // Get all cells that could potentially overlap with the bounding box
+        var minCell = PositionToCell(boundingBox.Min);
+        var maxCell = PositionToCell(boundingBox.Max);
+
+        for (int x = minCell.x; x <= maxCell.x; x++)
+        {
+            for (int z = minCell.z; z <= maxCell.z; z++)
+            {
+                var actors = GetActorsInCell((x, z));
+                foreach (var actor in actors)
+                {
+                    if (boundingBox.Contains(actor.Position))
+                    {
+                        yield return actor;
+                    }
+                }
+            }
+        }
+    }
+
+    public IEnumerable<T> GetInRange(Vector3 position, float range)
+    {
+        var rangeSquared = range * range;
+
+        // Calculate which cells could contain actors within range
+        var centerCell = PositionToCell(position);
+        int cellRadius = (int)MathF.Ceiling(range / CellLength);
+
+        for (int dx = -cellRadius; dx <= cellRadius; dx++)
+        {
+            for (int dz = -cellRadius; dz <= cellRadius; dz++)
+            {
+                var cell = (centerCell.x + dx, centerCell.z + dz);
+                var actors = GetActorsInCell(cell);
+
+                foreach (var actor in actors)
+                {
+                    var distanceSquared = Vector3.DistanceSquared(position, actor.Position);
+                    if (distanceSquared <= rangeSquared)
+                    {
+                        yield return actor;
+                    }
+                }
+            }
+        }
+    }
+
+    public IEnumerable<T> GetNearest(Vector3 position, float maxRange, int count)
+    {
+        var candidates = GetInRange(position, maxRange)
+            .Select(actor => new
+            {
+                Actor = actor,
+                DistanceSquared = Vector3.DistanceSquared(position, actor.Position),
+            })
+            .OrderBy(x => x.DistanceSquared)
+            .Take(count);
+
+        foreach (var candidate in candidates)
+        {
+            yield return candidate.Actor;
+        }
+    }
+
+    public T? GetNearest(Vector3 position, float maxRange)
+    {
+        return GetNearest(position, maxRange, 1).FirstOrDefault();
+    }
+
+    public IEnumerable<T> RaycastAll(Vector3 origin, Vector3 direction, float maxDistance)
+    {
+        // Simple approach: check all actors in range and test ray intersection with their AABBs
+        // For a more optimized implementation, you'd want to traverse the grid cells along the ray
+        var candidates = GetInRange(origin, maxDistance)
+            .Select(actor =>
+            {
+                var bbox = actor.GeometryRig.BoundingBox;
+
+                // Transform bounding box to world space
+                var worldMin = actor.Position + bbox.Min;
+                var worldMax = actor.Position + bbox.Max;
+                var worldBBox = new AxisAlignedBoundingBox(worldMin, worldMax);
+
+                // Ray-AABB intersection test
+                // Using slab method
+                var invDirection = new Vector3(
+                    MathF.Abs(direction.X) > 1e-6f ? 1.0f / direction.X : float.MaxValue,
+                    MathF.Abs(direction.Y) > 1e-6f ? 1.0f / direction.Y : float.MaxValue,
+                    MathF.Abs(direction.Z) > 1e-6f ? 1.0f / direction.Z : float.MaxValue
+                );
+
+                var t1 = (worldBBox.Min.X - origin.X) * invDirection.X;
+                var t2 = (worldBBox.Max.X - origin.X) * invDirection.X;
+                var t3 = (worldBBox.Min.Y - origin.Y) * invDirection.Y;
+                var t4 = (worldBBox.Max.Y - origin.Y) * invDirection.Y;
+                var t5 = (worldBBox.Min.Z - origin.Z) * invDirection.Z;
+                var t6 = (worldBBox.Max.Z - origin.Z) * invDirection.Z;
+
+                var tmin = MathF.Max(
+                    MathF.Max(MathF.Min(t1, t2), MathF.Min(t3, t4)),
+                    MathF.Min(t5, t6)
+                );
+                var tmax = MathF.Min(
+                    MathF.Min(MathF.Max(t1, t2), MathF.Max(t3, t4)),
+                    MathF.Max(t5, t6)
+                );
+
+                // No intersection if tmax < 0 (box is behind ray) or tmin > tmax (ray misses box)
+                if (tmax < 0 || tmin > tmax)
+                    return null;
+
+                // No intersection if beyond max distance
+                if (tmin > maxDistance)
+                    return null;
+
+                // Use tmin as the distance (first intersection point)
+                var distance = tmin >= 0 ? tmin : 0; // If origin is inside box, distance is 0
+
+                return new { Actor = actor, Distance = distance };
+            })
+            .Where(x => x != null)
+            .OrderBy(x => x!.Distance);
+
+        foreach (var candidate in candidates)
+        {
+            yield return candidate!.Actor;
+        }
+    }
+
+    /// <summary>
+    /// Convert a world position to a cell coordinate.
+    /// </summary>
+    private (int x, int z) PositionToCell(Vector3 position)
+    {
+        int x = (int)MathF.Floor(position.X / CellLength);
+        int z = (int)MathF.Floor(position.Z / CellLength);
+        return (x, z);
     }
 }

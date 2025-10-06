@@ -12,6 +12,8 @@
         "Raylib",
         "Renderable",
         "renderables",
+        "tmax",
+        "tmin",
         "Unrotated",
         "Xunit"
     ]
